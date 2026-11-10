@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#d3fc35">
+  <meta name="description" content="好きな順に24ステージを並べて、今日の2ステージをわかばがジャッジ。わかばジャッジメント。">
+  <title>わかばジャッジメント</title>
+  <link rel="preload" href="fonts/NotoSansJP-Bold.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="img/Wakaba_Run.png" as="image">
+  <link rel="preload" href="img/Wakaba_Defeat.png" as="image">
+  <style>
+    @font-face {
+      font-family: Wakaba;
+      src: url("fonts/NotoSansJP-Bold.otf") format("opentype");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: light;
+      --ink: #191a1e;
+      --paper: #f8f8f0;
+      --page: #eaece2;
+      --lime: #d3fc35;
+      --pink: #ff779d;
+      --purple: #aa8bfa;
+      --blue: #74d8e7;
+      --accent: var(--lime);
+      --hero-ink: var(--ink);
+      --arena: #e7e9db;
+      --bubble-paper: #fffef5;
+      --bubble-ink: var(--ink);
+      --frame-time: .466667s;
+      font-family: Wakaba, "Noto Sans JP", sans-serif;
+      font-weight: 700;
+      background: var(--page);
+      color: var(--ink);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; line-height: 1.7; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      opacity: .19;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23565b4a'/%3E%3C/svg%3E");
+    }
+    button, select { font: inherit; color: inherit; }
+    button, a, select { -webkit-tap-highlight-color: transparent; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; }
+    a { color: inherit; }
+    button:focus-visible, a:focus-visible, select:focus-visible, summary:focus-visible {
+      outline: 3px solid #5036d4;
+      outline-offset: 4px;
+    }
+    [hidden] { display: none !important; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: fixed; top: -80px; left: 12px; z-index: 100;
+      padding: 10px 16px; background: var(--lime); border: 2px solid var(--ink);
+    }
+    .skip-link:focus { top: 12px; }
+    #effects { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+    .topline {
+      background: var(--ink); color: var(--paper); min-height: 42px;
+      padding: 9px max(24px, calc((100vw - 1200px) / 2));
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      font-size: 10px; line-height: 1.4; letter-spacing: .16em;
+    }
+    .topline-brand { display: inline-flex; align-items: center; gap: 10px; }
+    .seed-mark { width: 15px; height: 18px; display: inline-block; transform: rotate(-12deg); position: relative; }
+    .seed-mark::before, .seed-mark::after {
+      content: ""; position: absolute; width: 8px; height: 13px; top: 1px;
+      background: var(--lime); clip-path: polygon(0 0, 100% 36%, 100% 100%, 0 65%);
+    }
+    .seed-mark::after { left: 7px; transform: scaleX(-1); }
+    .topline-note { color: #c0c1b8; letter-spacing: .07em; }
+    .shell { max-width: 1248px; margin: 0 auto; padding: 0 24px; }
+    .hero {
+      min-height: 222px; padding: 38px 0 31px; display: flex; align-items: center;
+      justify-content: space-between; gap: 26px; color: var(--hero-ink);
+    }
+    .hero-copy { position: relative; }
+    .eyebrow { font-size: 11px; letter-spacing: .14em; margin: 0 0 10px 4px; }
+    h1 { margin: 0; font-size: clamp(30px, 4.4vw, 57px); letter-spacing: -.075em; line-height: 1.32; }
+    .logo-sticker {
+      display: inline-block; position: relative; isolation: isolate; padding: 0 13px 5px 8px;
+      margin-right: 7px; transform: rotate(-4deg); color: var(--ink); letter-spacing: -.08em;
+    }
+    .logo-sticker::before {
+      content: ""; position: absolute; inset: -5px -2px 0; z-index: -1; background: var(--lime);
+      clip-path: polygon(5% 5%, 88% 0, 100% 20%, 95% 87%, 81% 100%, 0 95%, 2% 30%);
+    }
+    .hero-description { font-size: 12px; margin: 16px 0 0 4px; line-height: 1.9; }
+    .hero-aside { flex: 0 0 252px; position: relative; margin-right: 10px; }
+    .speech { position: relative; filter: drop-shadow(4px 5px 0 var(--ink)); }
+    .speech-shape { position: absolute; inset: 0; background: var(--ink); clip-path: var(--cut, polygon(7% 0, 91% 3%, 100% 19%, 98% 79%, 87% 100%, 9% 95%, 0 76%, 1% 21%)); }
+    .speech-shape::before { content: ""; position: absolute; inset: 3px; clip-path: inherit; background: var(--bubble-paper); }
+    .speech::after {
+      content: ""; position: absolute; width: 38px; height: 30px; left: 32%; bottom: -19px;
+      background: var(--ink); clip-path: polygon(0 0, 100% 0, 12% 100%);
+    }
+    .speech::before {
+      content: ""; position: absolute; width: 29px; height: 25px; left: calc(32% + 4px); bottom: -12px;
+      background: var(--bubble-paper); z-index: 2; clip-path: polygon(0 0, 100% 0, 7% 100%);
+    }
+    .speech-content { position: relative; z-index: 3; padding: 22px 25px; color: var(--bubble-ink); }
+    .hero-speech { --bubble-paper: var(--pink); transform: rotate(5deg); text-align: center; }
+    .hero-speech .speech-content { padding: 26px 24px; font-size: 20px; line-height: 1.65; letter-spacing: -.035em; }
+    .hero-speech .tiny { display: block; font-size: 10px; letter-spacing: .14em; margin-bottom: 3px; }
+    .hero-spark {
+      position: absolute; width: 31px; height: 31px; background: var(--hero-ink); left: -28px; top: 7px;
+      clip-path: polygon(43% 0, 63% 29%, 100% 19%, 78% 53%, 100% 80%, 64% 77%, 47% 100%, 33% 72%, 0 76%, 24% 49%, 6% 20%, 38% 28%);
+    }
+    .app-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 25px; align-items: start; }
+    .panel { background: var(--paper); border: 3px solid var(--ink); box-shadow: 5px 6px 0 var(--ink); min-width: 0; }
+    .panel-heading { padding: 20px 22px 16px; border-bottom: 2px solid var(--ink); }
+    .heading-line { display: flex; align-items: center; gap: 10px; }
+    .step-number {
+      font-size: 12px; letter-spacing: .06em; line-height: 1; padding: 9px 8px;
+      background: var(--ink); color: var(--lime); transform: rotate(-5deg);
+      clip-path: polygon(12% 0, 90% 0, 100% 15%, 93% 96%, 8% 100%, 0 83%);
+    }
+    h2 { font-size: 19px; margin: 0; letter-spacing: -.045em; line-height: 1.4; }
+    .panel-description { font-size: 11px; margin: 8px 0 0; line-height: 1.8; }
+    .ranking-heading { background: var(--lime); }
+    .ranking-meta { padding: 16px 20px 13px; }
+    .progress-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; }
+    .progress-value { font-size: 11px; white-space: nowrap; }
+    .progress-value strong { font-size: 22px; line-height: 1; }
+    .progress-value span { color: #66695d; margin-left: 4px; }
+    .progress-track { height: 7px; background: #dcdfd1; margin-top: 10px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0; background: var(--ink); transition: width .22s ease; }
+    .ranking-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 12px 0 0; }
+    .text-button { border: 0; padding: 4px 0; background: none; font-size: 10px; text-decoration: underline; text-underline-offset: 3px; }
+    .text-button:disabled { opacity: .4; text-decoration: none; }
+    .text-button:hover:not(:disabled) { color: #6142b6; }
+    .ranking-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7px 11px; padding: 0 20px 19px; }
+    .rank-row { display: flex; align-items: stretch; gap: 0; min-width: 0; background: #fffef8; border: 1px solid #b7baac; }
+    .rank-row.is-set { border-color: var(--ink); }
+    .rank-index { min-width: 43px; width: 43px; padding: 9px 3px; text-align: center; display: flex; align-items: baseline; justify-content: center; gap: 2px; background: #e7e9dd; border-right: 1px solid #b7baac; font-size: 17px; line-height: 1.45; }
+    .rank-index small { font-size: 8px; }
+    .rank-row.is-set .rank-index { background: var(--lime); border-color: var(--ink); }
+    .rank-row:nth-child(n+7).is-set .rank-index { background: #e4efb2; }
+    .rank-row:nth-child(n+13).is-set .rank-index { background: #d6d0f0; }
+    .rank-row:nth-child(n+19).is-set .rank-index { background: #bbb1db; }
+    .rank-row:nth-child(-n+12) { grid-column: 1; }
+    .rank-row:nth-child(n+13) { grid-column: 2; }
+    .rank-row:nth-child(13) { grid-row: 1; }
+    .rank-row:nth-child(14) { grid-row: 2; }
+    .rank-row:nth-child(15) { grid-row: 3; }
+    .rank-row:nth-child(16) { grid-row: 4; }
+    .rank-row:nth-child(17) { grid-row: 5; }
+    .rank-row:nth-child(18) { grid-row: 6; }
+    .rank-row:nth-child(19) { grid-row: 7; }
+    .rank-row:nth-child(20) { grid-row: 8; }
+    .rank-row:nth-child(21) { grid-row: 9; }
+    .rank-row:nth-child(22) { grid-row: 10; }
+    .rank-row:nth-child(23) { grid-row: 11; }
+    .rank-row:nth-child(24) { grid-row: 12; }
+    select {
+      appearance: none; -webkit-appearance: none; border-radius: 0; border: 0; min-width: 0;
+      background-color: transparent; background-repeat: no-repeat; background-position: right 9px center; background-size: 9px 6px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23191a1e' stroke-width='2'/%3E%3C/svg%3E");
+      cursor: pointer; text-overflow: ellipsis;
+    }
+    select:disabled { cursor: not-allowed; opacity: .54; }
+    .rank-select { width: 100%; flex: 1; padding: 8px 24px 8px 8px; font-size: 10px; line-height: 1.6; }
+    .rank-select:focus-visible { outline-offset: -3px; }
+    .rank-select:has(option:checked[value=""]) { color: #777b6e; }
+    .ranking-bottom { padding: 0 20px 18px; }
+    .button {
+      border: 2px solid var(--ink); background: var(--ink); color: var(--paper); padding: 12px 18px;
+      font-size: 12px; line-height: 1.5; display: inline-flex; align-items: center; justify-content: center; gap: 16px;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .button:not(:disabled):hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 #8b75c3; }
+    .button:active:not(:disabled) { transform: translate(0); box-shadow: none; }
+    .button:disabled { background: #d8dbcf; color: #777b6e; border-color: #d8dbcf; }
+    .button-lime { background: var(--lime); color: var(--ink); }
+    .ranking-cta { width: 100%; justify-content: space-between; }
+    .arrow { font-size: 19px; line-height: 1; }
+    .save-note { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 11px 0 0; font-size: 9px; color: #676b5f; }
+    .save-dot { display: inline-block; width: 5px; height: 5px; background: #697e3a; }
+    .message { margin: 0 20px 14px; border: 2px solid #b94459; background: #ffe8ed; font-size: 11px; padding: 10px 12px; }
+    .judge-column { position: sticky; top: 20px; min-width: 0; scroll-margin-top: 20px; }
+    .judge-heading { background: var(--pink); }
+    .judge-heading .step-number { color: var(--pink); }
+    .judge-controls { padding: 17px 20px 19px; border-bottom: 2px solid var(--ink); }
+    .pair-field { display: grid; grid-template-columns: 20px minmax(0, 1fr) 44px; align-items: center; gap: 10px; }
+    .pair-field + .pair-field { margin-top: 10px; }
+    .pair-label { font-size: 12px; color: #6d6b66; }
+    .pair-select { width: 100%; padding: 11px 27px 11px 10px; border: 2px solid var(--ink); background-color: #fffef8; font-size: 12px; }
+    .pair-rank { font-size: 10px; text-align: center; background: #e7e9dd; padding: 6px 2px; }
+    .pair-hint { margin: 11px 0 0; font-size: 10px; color: #65685b; }
+    .pair-error { margin: 11px 0 0; font-size: 11px; color: #a02347; }
+    .judge-result { padding: 18px 20px 19px; position: relative; }
+    .result-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .mini-label { font-size: 9px; letter-spacing: .15em; }
+    .live-tag { font-size: 9px; border: 1px solid #979b89; padding: 3px 7px; background: var(--paper); }
+    .live-tag::before { content: ""; display: inline-block; width: 5px; height: 5px; margin-right: 5px; background: #9b9e91; }
+    .has-result .live-tag { border-color: var(--ink); background: var(--accent); }
+    .has-result .live-tag::before { background: var(--ink); }
+    .result-summary { display: flex; align-items: center; gap: 15px; margin: 15px 0 8px; min-height: 83px; }
+    .rating-stamp {
+      width: 88px; height: 85px; display: flex; align-items: baseline; justify-content: center; gap: 3px; flex: 0 0 88px;
+      background: var(--accent); color: var(--ink); transform: rotate(-6deg);
+      clip-path: polygon(11% 3%, 88% 0, 100% 17%, 95% 80%, 82% 99%, 5% 94%, 0 75%, 2% 19%);
+      padding: 2px 4px 3px; line-height: 1.4;
+    }
+    .rating-letter { font-family: Wakaba, sans-serif; font-size: 54px; letter-spacing: -.1em; font-style: italic; }
+    .rating-stamp small { font-size: 10px; }
+    .score-number { font-size: 49px; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -.06em; }
+    .score-unit { font-size: 14px; margin-left: 5px; }
+    .score-label { font-size: 9px; color: #6d7063; margin: 4px 0 0; }
+    .waiting-heading { font-size: 20px; line-height: 1.6; margin: 0; letter-spacing: -.04em; }
+    .waiting-copy { font-size: 10px; color: #65685b; margin: 4px 0 0; }
+    .calculation { background: #e9ebdf; padding: 8px 10px; font-size: 11px; display: flex; justify-content: space-between; gap: 4px; margin: 12px 0 15px; }
+    .calculation-detail { font-variant-numeric: tabular-nums; }
+    .arena { position: relative; background: var(--arena); min-height: 313px; overflow: hidden; border: 2px solid var(--ink); isolation: isolate; }
+    .arena::before { content: ""; position: absolute; inset: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Cpath d='M0 18L18 0' stroke='%23191a1e' stroke-opacity='.08' stroke-width='1'/%3E%3C/svg%3E"); }
+    .arena-mark { position: absolute; width: 145px; height: 145px; background: var(--accent); bottom: 16px; right: -7px; transform: rotate(12deg); clip-path: polygon(18% 0, 82% 5%, 100% 29%, 91% 83%, 68% 100%, 9% 86%, 0 32%); }
+    .arena-mark::after { content: ""; position: absolute; width: 78px; height: 25px; left: 9px; bottom: 18px; background: var(--ink); opacity: .1; transform: rotate(-20deg); }
+    .arena-deco { position: absolute; width: 48px; height: 45px; left: 15px; bottom: 42px; transform: rotate(-16deg); }
+    .arena-deco::before, .arena-deco::after { content: ""; position: absolute; width: 11px; height: 25px; background: var(--ink); clip-path: polygon(0 0, 100% 0, 75% 100%, 14% 92%); }
+    .arena-deco::after { left: 20px; height: 36px; top: -5px; transform: rotate(17deg); }
+    .result-speech { margin: 15px 14px 0; z-index: 3; filter: drop-shadow(2px 3px 0 var(--ink)); }
+    .result-speech::after { left: 62%; bottom: -17px; }
+    .result-speech::before { left: calc(62% + 4px); bottom: -10px; }
+    .result-speech .speech-content { padding: 20px 22px 22px; font-size: 13px; line-height: 1.8; letter-spacing: -.025em; overflow-wrap: anywhere; }
+    .speech-line { margin: 0; }
+    .speech-line + .speech-line { margin-top: 3px; }
+    .character { position: relative; width: 190px; margin: 12px 18px 0 auto; z-index: 2; }
+    .sprite-flip { transform-origin: center; }
+    .sprite-window { width: 100%; aspect-ratio: var(--sprite-ratio, 1); overflow: hidden; }
+    .run-sheet { display: block; width: 400%; height: 100%; max-width: none; animation: run-frames var(--frame-time) steps(4, end) infinite; }
+    .defeat-image { display: block; width: 100%; height: auto; }
+    .character-ground { position: absolute; width: 155px; height: 14px; bottom: 9px; left: 20px; background: var(--ink); opacity: .13; z-index: -1; clip-path: polygon(10% 8%, 82% 0, 100% 48%, 87% 90%, 7% 100%, 0 54%); }
+    .asset-error { margin: 14px; font-size: 10px; background: var(--paper); border: 1px solid var(--ink); padding: 8px; position: relative; }
+    @keyframes run-frames { to { transform: translateX(-100%); } }
+    @keyframes small-shake {
+      0%, 100% { transform: translate(-6px, -4px); }
+      17% { transform: translate(8px, 3px); }
+      34% { transform: translate(-4px, 7px); }
+      51% { transform: translate(6px, -6px); }
+      68% { transform: translate(-8px, 2px); }
+      85% { transform: translate(3px, 6px); }
+    }
+    .scoring-guide { margin-top: 19px; font-size: 10px; }
+    .scoring-guide summary { cursor: pointer; padding: 1px 0 8px; }
+    .scoring-guide table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: left; }
+    .scoring-guide td, .scoring-guide th { border-top: 1px solid #d3d6c8; padding: 7px 8px; }
+    .scoring-guide th { font-size: 9px; color: #626658; }
+    .guide-grade { font-style: italic; font-size: 13px; }
+    .scoring-note { font-size: 9px; line-height: 1.9; color: #626658; margin: 8px 0 0; }
+    .bottom-tape { margin: 34px 0 0; border-top: 2px solid var(--hero-ink); border-bottom: 2px solid var(--hero-ink); padding: 10px 0; overflow: hidden; color: var(--hero-ink); white-space: nowrap; font-size: 11px; letter-spacing: .11em; }
+    .bottom-tape span { padding: 0 15px; }
+    .bottom-tape b { color: #7657b8; font-size: 15px; }
+    footer { padding: 21px 0 25px; font-size: 9px; color: var(--hero-ink); opacity: .72; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    footer p { margin: 0; }
+    dialog { max-width: min(430px, calc(100vw - 36px)); padding: 24px; border: 3px solid var(--ink); box-shadow: 7px 7px 0 var(--ink); background: var(--paper); color: var(--ink); }
+    dialog::backdrop { background: rgb(17 14 32 / .65); }
+    dialog h2 { margin: 0 0 10px; }
+    dialog p { font-size: 12px; line-height: 1.9; margin: 0 0 20px; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .button-outline { background: var(--paper); color: var(--ink); }
+    noscript { display: block; padding: 20px; margin: 20px 0; border: 3px solid var(--ink); background: var(--pink); }
+
+    /* 評価ごとの色と動き。虹色も単色の切り替えを使い、グラデーションは使わない。 */
+    :root[data-rating="X"] { --accent: #e1ff35; --arena: #f7f3cb; animation: rainbow-page 8.4s steps(1, end) infinite; }
+    :root[data-rating="X"] .rating-stamp,
+    :root[data-rating="X"] .arena-mark,
+    :root[data-rating="X"] .judge-heading,
+    :root[data-rating="X"] .live-tag { animation: rainbow-accent 5.6s steps(1, end) infinite; }
+    :root[data-rating="X"] .judge-panel { box-shadow: 5px 6px 0 #9b5df4, 10px 12px 0 #ff77a4, 15px 18px 0 #54d8df; }
+    :root[data-rating="S"] { --accent: #e1ff35; --arena: #f0f5cc; }
+    :root[data-rating="A"] { --accent: #c2ec60; --arena: #e7eddb; }
+    :root[data-rating="B"] { --accent: #b39cff; --page: #ccc9e8; --arena: #272452; --bubble-paper: #ebe5ff; }
+    :root[data-rating="B"] .sprite-flip { transform: scaleX(-1); }
+    :root[data-rating="B"] .judge-heading { background: #b8a5ed; }
+    :root[data-rating="B"] .arena-deco::before,
+    :root[data-rating="B"] .arena-deco::after { background: #8585d4; }
+    :root[data-rating="B"] .arena-mark { background: #5751a0; }
+    :root[data-rating="C"] { --page: #141320; --hero-ink: #f2ecff; --accent: #ad94d8; --paper: #f0ecf6; --arena: #0c0c18; --bubble-paper: #242039; --bubble-ink: #eee7ff; }
+    :root[data-rating="C"] .ranking-heading { background: #b8acd4; }
+    :root[data-rating="C"] .judge-heading { background: #9a8bc5; }
+    :root[data-rating="C"] .arena-mark { background: #332b58; }
+    :root[data-rating="C"] .arena-deco::before,
+    :root[data-rating="C"] .arena-deco::after { background: #6d5e98; }
+    :root[data-rating="C"] .defeat-image { animation: small-shake .32s steps(1, end) infinite; }
+    :root[data-rating="C"] .hero-speech { --bubble-ink: var(--ink); --bubble-paper: #b3a1d3; }
+    @keyframes rainbow-page {
+      0%, 100% { background-color: #f1d4df; }
+      14% { background-color: #f4ddbc; }
+      28% { background-color: #eeeeac; }
+      42% { background-color: #d4e9b3; }
+      56% { background-color: #bae5e8; }
+      70% { background-color: #cdd3ed; }
+      84% { background-color: #e2c6ee; }
+    }
+    @keyframes rainbow-accent {
+      0%, 100% { background-color: #ff8fa7; }
+      14% { background-color: #ffa35e; }
+      28% { background-color: #ffe64b; }
+      42% { background-color: #c5fa3a; }
+      56% { background-color: #63dfde; }
+      70% { background-color: #93b3ff; }
+      84% { background-color: #d29aff; }
+    }
+    @media (min-width: 1350px) { .rank-select { font-size: 11px; } }
+    @media (max-width: 1080px) {
+      .app-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; }
+      .ranking-grid { grid-template-columns: minmax(0, 1fr); padding-left: 16px; padding-right: 16px; gap: 7px; }
+      .rank-row:nth-child(n) { grid-column: auto; grid-row: auto; }
+      .rank-select { font-size: 12px; }
+      .rank-index { min-width: 48px; padding: 8px 3px; }
+      .hero-aside { flex-basis: 220px; }
+      .hero-speech .speech-content { font-size: 18px; }
+      .pair-select { font-size: 11px; }
+      .judge-controls, .judge-result { padding-left: 15px; padding-right: 15px; }
+    }
+    @media (max-width: 760px) {
+      .topline { padding: 10px 18px; min-height: 39px; font-size: 9px; }
+      .topline-note { display: none; }
+      .shell { padding: 0 18px; }
+      .hero { min-height: 0; padding: 29px 0 27px; gap: 14px; align-items: flex-start; }
+      h1 { font-size: clamp(28px, 6.9vw, 46px); letter-spacing: -.075em; }
+      .hero-copy { width: 100%; }
+      .hero-aside { display: none; }
+      .eyebrow { font-size: 9px; margin-bottom: 12px; letter-spacing: .11em; }
+      .hero-description { font-size: 10px; margin-top: 13px; }
+      .app-grid { grid-template-columns: 1fr; gap: 24px; }
+      .panel { box-shadow: 4px 5px 0 var(--ink); }
+      .panel-heading { padding: 17px 18px 14px; }
+      h2 { font-size: 18px; }
+      .panel-description { font-size: 10px; }
+      .ranking-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7px 10px; }
+      .rank-row:nth-child(-n+12) { grid-column: 1; }
+      .rank-row:nth-child(n+13) { grid-column: 2; }
+      .rank-row:nth-child(13) { grid-row: 1; }
+      .rank-row:nth-child(14) { grid-row: 2; }
+      .rank-row:nth-child(15) { grid-row: 3; }
+      .rank-row:nth-child(16) { grid-row: 4; }
+      .rank-row:nth-child(17) { grid-row: 5; }
+      .rank-row:nth-child(18) { grid-row: 6; }
+      .rank-row:nth-child(19) { grid-row: 7; }
+      .rank-row:nth-child(20) { grid-row: 8; }
+      .rank-row:nth-child(21) { grid-row: 9; }
+      .rank-row:nth-child(22) { grid-row: 10; }
+      .rank-row:nth-child(23) { grid-row: 11; }
+      .rank-row:nth-child(24) { grid-row: 12; }
+      .rank-select { font-size: 10px; }
+      .rank-index { min-width: 38px; width: 38px; font-size: 16px; }
+      .judge-column { position: static; scroll-margin-top: 14px; }
+      .judge-controls, .judge-result { padding-left: 18px; padding-right: 18px; }
+      .pair-select { font-size: 13px; }
+      .arena { min-height: 302px; }
+      .result-speech .speech-content { font-size: 14px; padding: 22px 27px; }
+      .character { width: 185px; margin-right: 32px; margin-top: 6px; }
+      .bottom-tape { margin-top: 28px; font-size: 9px; }
+      footer { align-items: flex-start; font-size: 8px; flex-direction: column; gap: 4px; }
+    }
+    @media (max-width: 470px) {
+      .ranking-grid { grid-template-columns: minmax(0, 1fr); gap: 7px; }
+      .rank-row:nth-child(n) { grid-column: auto; grid-row: auto; }
+      .rank-select { font-size: 16px; padding: 10px 28px 10px 10px; }
+      .rank-index { min-width: 48px; font-size: 18px; padding-top: 11px; }
+      .rank-index small { font-size: 9px; }
+      .pair-field { grid-template-columns: 16px minmax(0, 1fr) 38px; gap: 7px; }
+      .pair-select { font-size: 16px; }
+      .result-speech { margin-left: 10px; margin-right: 10px; }
+      .result-speech .speech-content { font-size: 12px; padding: 21px 20px; }
+      .score-number { font-size: 46px; }
+      .hero-description br { display: none; }
+      .ranking-toolbar { gap: 14px; }
+      .ranking-toolbar .text-button { font-size: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#ranking">順位付けへ進む</a>
+  <canvas id="effects" aria-hidden="true"></canvas>
+  <div class="topline">
+    <span class="topline-brand"><i class="seed-mark" aria-hidden="true"></i> WAKABA JUDGEMENT</span>
+    <span class="topline-note">ステージの好みは、わかばに聞け。</span>
+  </div>
+
+  <main class="shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">YOUR RANKING. WAKABA'S JUDGEMENT.</p>
+        <h1><span class="logo-sticker">わかば</span>ジャッジメント</h1>
+        <p class="hero-description">ステージを好きな順に並べて、今日の2ステージを選ぶだけ。<br>潜るか、休むか。わかばがジャッジするわかば！</p>
+      </div>
+      <div class="hero-aside" aria-hidden="true">
+        <i class="hero-spark"></i>
+        <div class="speech hero-speech" data-polygon>
+          <div class="speech-shape"></div>
+          <div class="speech-content"><span class="tiny">LET'S CHECK!</span>今日の2ステ、<br>潜って大丈夫？</div>
+        </div>
+      </div>
+    </header>
+
+    <noscript>このページの順位付けと判定にはJavaScriptが必要です。ブラウザーの設定でJavaScriptを有効にしてください。</noscript>
+
+    <div class="app-grid">
+      <section class="panel ranking-panel" id="ranking" aria-labelledby="ranking-title">
+        <header class="panel-heading ranking-heading">
+          <div class="heading-line"><span class="step-number">01</span><h2 id="ranking-title">好きな順に、並べるわかば！</h2></div>
+          <p class="panel-description">1位は得意なステージ、24位は苦手なステージ。<br>プルダウンは50音順。選んだステージは、ほかの順位から消えます。</p>
+        </header>
+        <div class="ranking-meta">
+          <div class="progress-line">
+            <span id="progress-label">まずは1位から選んでみよう。</span>
+            <span class="progress-value"><strong id="progress-count">0</strong><span>/ 24</span></span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-label="順位付けの進捗" aria-valuemin="0" aria-valuemax="24" aria-valuenow="0" id="progress"><div class="progress-fill" id="progress-fill"></div></div>
+          <div class="ranking-toolbar">
+            <button class="text-button" id="fill-empty" type="button">空き枠を50音順で埋める ↗</button>
+            <button class="text-button" id="reset-ranking" type="button" disabled>順位をリセット</button>
+          </div>
+        </div>
+        <p class="message" id="ranking-error" role="alert" hidden></p>
+        <div class="ranking-grid" id="ranking-grid"></div>
+        <div class="ranking-bottom">
+          <button class="button ranking-cta" id="go-judge" type="button" disabled><span id="cta-label">24ステージを選ぶと判定できます</span><span class="arrow" aria-hidden="true">↗</span></button>
+          <p class="save-note"><i class="save-dot" aria-hidden="true"></i><span id="save-note">順位はこのブラウザーに自動保存されます</span></p>
+        </div>
+      </section>
+
+      <div class="judge-column" id="judgement">
+        <section class="panel judge-panel" aria-labelledby="judge-title">
+          <header class="panel-heading judge-heading">
+            <div class="heading-line"><span class="step-number">02</span><h2 id="judge-title">今日の2ステを、ジャッジ！</h2></div>
+            <p class="panel-description">持ち点50から、2ステージの順位を引いて判定。</p>
+          </header>
+          <div class="judge-controls">
+            <div class="pair-field">
+              <label class="pair-label" for="stage-one"><span aria-hidden="true">A</span><span class="sr-only">1つ目のステージ</span></label>
+              <select class="pair-select" id="stage-one" disabled aria-describedby="pair-hint"><option value="">ステージを選択</option></select>
+              <span class="pair-rank" id="rank-one">— 位</span>
+            </div>
+            <div class="pair-field">
+              <label class="pair-label" for="stage-two"><span aria-hidden="true">B</span><span class="sr-only">2つ目のステージ</span></label>
+              <select class="pair-select" id="stage-two" disabled aria-describedby="pair-hint"><option value="">ステージを選択</option></select>
+              <span class="pair-rank" id="rank-two">— 位</span>
+            </div>
+            <p class="pair-hint" id="pair-hint">先に、24ステージの順位を決めてください。</p>
+            <p class="pair-error" id="pair-error" role="alert" hidden></p>
+          </div>
+
+          <div class="judge-result" id="judge-result">
+            <div class="result-head"><span class="mini-label">WAKABA'S VERDICT</span><span class="live-tag" id="live-tag">準備中</span></div>
+            <div class="result-summary">
+              <div id="rating-display" class="rating-stamp" aria-hidden="true"><span class="rating-letter" id="rating-letter">?</span><small>評価</small></div>
+              <div id="score-display" hidden><div><strong class="score-number" id="score-number">—</strong><span class="score-unit">点</span></div><p class="score-label">50点 − ステージの順位</p></div>
+              <div id="waiting-display"><p class="waiting-heading" id="waiting-heading">まずは順位付け！</p><p class="waiting-copy" id="waiting-copy">あなたのステージの好みを教えてね。</p></div>
+            </div>
+            <div class="calculation"><span>計算式</span><span class="calculation-detail" id="calculation">50 − ？ − ？ ＝ ？</span></div>
+            <div class="arena" id="arena">
+              <div class="arena-mark" aria-hidden="true"></div>
+              <div class="arena-deco" aria-hidden="true"></div>
+              <div class="speech result-speech" id="result-speech" data-polygon>
+                <div class="speech-shape"></div>
+                <div class="speech-content" id="speech-content"><p class="speech-line">まずは、好きな順に</p><p class="speech-line">ステージを並べるわかば！</p></div>
+              </div>
+              <div class="character" id="character">
+                <div class="character-ground" aria-hidden="true"></div>
+                <div class="sprite-flip">
+                  <div class="sprite-window" id="sprite-window"><img class="run-sheet" id="run-sheet" src="img/Wakaba_Run.png" alt="走るわかば" width="1024" height="256" draggable="false"></div>
+                  <img class="defeat-image" id="defeat-image" src="img/Wakaba_Defeat.png" alt="絶望するわかば" width="256" height="256" draggable="false" hidden>
+                </div>
+              </div>
+              <p class="asset-error" id="asset-error" hidden>キャラクター画像を読み込めませんでした。imgフォルダー内の画像を確認してください。</p>
+            </div>
+            <details class="scoring-guide">
+              <summary>点数と評価の目安</summary>
+              <table>
+                <thead><tr><th scope="col">評価</th><th scope="col">点数</th></tr></thead>
+                <tbody>
+                  <tr><td class="guide-grade">X</td><td>45〜50点</td></tr>
+                  <tr><td class="guide-grade">S</td><td>40〜44点</td></tr>
+                  <tr><td class="guide-grade">A</td><td>30〜39点</td></tr>
+                  <tr><td class="guide-grade">B</td><td>15〜29点</td></tr>
+                  <tr><td class="guide-grade">C</td><td>14点以下</td></tr>
+                </tbody>
+              </table>
+              <p class="scoring-note">異なる2ステージを選ぶため、実際の点数は3〜47点です。</p>
+            </details>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="bottom-tape" aria-hidden="true"><span>RANK YOUR STAGES</span><b>✦</b><span>CHOOSE YOUR TWO</span><b>✦</b><span>TRUST YOUR WAKABA</span><b>✦</b><span>RANK YOUR STAGES</span><b>✦</b><span>CHOOSE YOUR TWO</span></div>
+    <footer><p>『スプラトゥーン』の非公式ファンサイトです。</p><p>WAKABA JUDGEMENT</p></footer>
+    <p class="sr-only" id="announcer" role="status" aria-live="polite" aria-atomic="true"></p>
+  </main>
+
+  <dialog id="reset-dialog" aria-labelledby="reset-title" aria-describedby="reset-description">
+    <h2 id="reset-title">順位をリセットしますか？</h2>
+    <p id="reset-description">保存した24ステージの順位と、判定中の2ステージを未選択に戻します。</p>
+    <form method="dialog" class="dialog-actions"><button class="button button-outline" value="cancel">戻る</button><button class="button button-lime" value="reset">リセットする</button></form>
+  </dialog>
+
+  <script>
+    "use strict";
+
+    // 変更する場合はここを編集。1F = 1/60秒、4コマで1ループ。
+    const BASE_POINTS = 50;
+    const STORAGE_KEY = "wakaba-judgement:v1";
+    const STAGES = [
+      { name: "ヒラメが丘団地", kana: "ひらめがおかだんち" },
+      { name: "リュウグウターミナル", kana: "りゅうぐうたーみなる" },
+      { name: "マンタマリア号", kana: "まんたまりあごう" },
+      { name: "マテガイ放水路", kana: "まてがいほうすいろ" },
+      { name: "タラポートショッピングパーク", kana: "たらぽーとしょっぴんぐぱーく" },
+      { name: "タカアシ経済特区", kana: "たかあしけいざいとっく" },
+      { name: "マサバ海峡大橋", kana: "まさばかいきょうおおはし" },
+      { name: "カジキ空港", kana: "かじきくうこう" },
+      { name: "オヒョウ海運", kana: "おひょうかいうん" },
+      { name: "ネギトロ炭鉱", kana: "ねぎとろたんこう" },
+      { name: "ゴンズイ地区", kana: "ごんずいちく" },
+      { name: "バイガイ亭", kana: "ばいがいてい" },
+      { name: "ナンプラー遺跡", kana: "なんぷらーいせき" },
+      { name: "スメーシーワールド", kana: "すめーしーわーるど" },
+      { name: "ヤガラ市場", kana: "やがらいちば" },
+      { name: "キンメダイ美術館", kana: "きんめだいびじゅつかん" },
+      { name: "クサヤ温泉", kana: "くさやおんせん" },
+      { name: "チョウザメ造船", kana: "ちょうざめぞうせん" },
+      { name: "コンブトラック", kana: "こんぶとらっく" },
+      { name: "ユノハナ大渓谷", kana: "ゆのはなだいけいこく" },
+      { name: "ザトウマーケット", kana: "ざとうまーけっと" },
+      { name: "海女美術大学", kana: "あまびじゅつだいがく" },
+      { name: "ナメロウ金属", kana: "なめろうきんぞく" },
+      { name: "マヒマヒリゾート＆スパ", kana: "まひまひりぞーとあんどすぱ" }
+    ].sort((a, b) => new Intl.Collator("ja").compare(a.kana, b.kana));
+
+    const RATINGS = [
+      { grade: "X", min: 45, frames: 2, lines: ["こんな神ステ、めったにないわかば！", "早く潜るわかば！"] },
+      { grade: "S", min: 40, frames: 4, lines: ["悪くないわかば！", "打開を気を付ければきっと良いはずわかば！"] },
+      { grade: "A", min: 30, frames: 7, lines: ["微妙わかば…", "わかばだったら潜るのは慎重になるわかば。"] },
+      { grade: "B", min: 15, frames: 4, lines: ["うわああああ！！潜ったら沼りそうわかば！", "今日は見送って、ゆっくり休むわかば。"] },
+      { grade: "C", min: -Infinity, frames: 0, lines: ["なんだこれわかば。無理わかば。", "潜ろうものなら、29F05A9Cポイント溶かすわかば。"] }
+    ];
+
+    const $ = (id) => document.getElementById(id);
+    const stageNames = STAGES.map((stage) => stage.name);
+    const stageSet = new Set(stageNames);
+    const rankingSelects = [];
+    const pairSelects = [$("stage-one"), $("stage-two")];
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let rankings = Array(STAGES.length).fill("");
+    let pair = ["", ""];
+    let storageAvailable = true;
+    let lastAnnouncement = "";
+
+    function announce(message) {
+      if (message === lastAnnouncement) return;
+      lastAnnouncement = message;
+      $("announcer").textContent = message;
+    }
+
+    function rankingIsComplete(values = rankings) {
+      return values.length === STAGES.length && values.every((name) => stageSet.has(name)) && new Set(values).size === STAGES.length;
+    }
+
+    function judgePair(values, first, second) {
+      if (!rankingIsComplete(values) || !first || !second || first === second) return null;
+      const firstRank = values.indexOf(first) + 1;
+      const secondRank = values.indexOf(second) + 1;
+      if (!firstRank || !secondRank) return null;
+      const score = BASE_POINTS - firstRank - secondRank;
+      return { score, firstRank, secondRank, rating: RATINGS.find((rating) => score >= rating.min) };
+    }
+
+    function showRankingError(message = "") {
+      $("ranking-error").textContent = message;
+      $("ranking-error").hidden = !message;
+    }
+
+    function storageFallback() {
+      storageAvailable = false;
+      $("save-note").textContent = "自動保存できないため、再読み込みすると順位が消えます";
+    }
+
+    function saveState() {
+      if (!storageAvailable) return;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, rankings, pair }));
+      } catch (_) {
+        storageFallback();
+      }
+    }
+
+    function loadState() {
+      let raw;
+      try { raw = localStorage.getItem(STORAGE_KEY); }
+      catch (_) { storageFallback(); return; }
+      if (!raw) return;
+      try {
+        const saved = JSON.parse(raw);
+        if (!saved || saved.version !== 1 || !Array.isArray(saved.rankings) || saved.rankings.length !== STAGES.length) {
+          showRankingError("保存されていた順位を読み込めませんでした。もう一度、順位を選んでください。");
+          return;
+        }
+        const seen = new Set();
+        let repaired = false;
+        rankings = saved.rankings.map((name) => {
+          if (name === "") return "";
+          if (!stageSet.has(name) || seen.has(name)) { repaired = true; return ""; }
+          seen.add(name);
+          return name;
+        });
+        if (Array.isArray(saved.pair) && saved.pair.length === 2) {
+          pair = saved.pair.map((name) => stageSet.has(name) ? name : "");
+          if (pair[0] && pair[0] === pair[1]) { pair[1] = ""; repaired = true; }
+        }
+        if (repaired) showRankingError("保存されたデータに重複または不明なステージがあったため、該当する選択を未選択に戻しました。");
+      } catch (_) {
+        showRankingError("保存されていた順位を読み込めませんでした。もう一度、順位を選んでください。");
+      }
+    }
+
+    function makeOptions(select, selected, excluded, placeholder) {
+      const options = document.createDocumentFragment();
+      options.append(new Option(placeholder, ""));
+      for (const name of stageNames) {
+        if (name === selected || !excluded.has(name)) options.append(new Option(name, name));
+      }
+      select.replaceChildren(options);
+      select.value = selected;
+    }
+
+    function buildRanking() {
+      const fragment = document.createDocumentFragment();
+      STAGES.forEach((_, index) => {
+        const row = document.createElement("div");
+        row.className = "rank-row";
+        const label = document.createElement("label");
+        label.className = "rank-index";
+        label.htmlFor = `rank-${index + 1}`;
+        label.append(String(index + 1));
+        const unit = document.createElement("small");
+        unit.textContent = "位";
+        label.append(unit);
+        const select = document.createElement("select");
+        select.className = "rank-select";
+        select.id = label.htmlFor;
+        select.setAttribute("aria-label", `${index + 1}位のステージ`);
+        select.addEventListener("change", () => {
+          const name = select.value;
+          const duplicate = name && rankings.findIndex((other, otherIndex) => otherIndex !== index && other === name);
+          if (name && duplicate !== -1) {
+            showRankingError(`${name}は${duplicate + 1}位で選択済みです。別のステージを選んでください。`);
+            select.value = rankings[index];
+            return;
+          }
+          if (name && !stageSet.has(name)) {
+            showRankingError("一覧にないステージは選べません。");
+            select.value = rankings[index];
+            return;
+          }
+          rankings[index] = name;
+          showRankingError();
+          refresh();
+          saveState();
+          const count = rankings.filter(Boolean).length;
+          announce(count === STAGES.length ? "24ステージの順位が決まりました。2つのステージを選んで判定できます。" : `${count}ステージを選択済み。あと${STAGES.length - count}ステージです。`);
+        });
+        rankingSelects.push(select);
+        row.append(label, select);
+        fragment.append(row);
+      });
+      $("ranking-grid").append(fragment);
+    }
+
+    function refreshRankings() {
+      const selected = new Set(rankings.filter(Boolean));
+      rankingSelects.forEach((select, index) => {
+        makeOptions(select, rankings[index], selected, "ステージを選択");
+        select.parentElement.classList.toggle("is-set", Boolean(rankings[index]));
+      });
+      const count = rankings.filter(Boolean).length;
+      const complete = rankingIsComplete();
+      $("progress-count").textContent = count;
+      $("progress").setAttribute("aria-valuenow", count);
+      $("progress-fill").style.width = `${count / STAGES.length * 100}%`;
+      $("progress-label").textContent = complete ? "24ステージ、準備OK！" : count ? `あと${STAGES.length - count}ステージ！` : "まずは1位から選んでみよう。";
+      $("go-judge").disabled = !complete;
+      $("cta-label").textContent = complete ? "この順位でジャッジする" : "24ステージを選ぶと判定できます";
+      $("fill-empty").disabled = complete;
+      $("reset-ranking").disabled = count === 0;
+    }
+
+    function refreshPair() {
+      const complete = rankingIsComplete();
+      pairSelects.forEach((select, index) => {
+        makeOptions(select, pair[index], new Set([pair[1 - index]].filter(Boolean)), "ステージを選択");
+        select.disabled = !complete;
+        const rank = complete && pair[index] ? rankings.indexOf(pair[index]) + 1 : 0;
+        $(index ? "rank-two" : "rank-one").textContent = rank ? `${rank}位` : "— 位";
+      });
+      $("pair-hint").textContent = complete ? "2つ選ぶと、わかばが自動でジャッジします。" : "先に、24ステージの順位を決めてください。";
+    }
+
+    function setSpeech(lines) {
+      const fragment = document.createDocumentFragment();
+      for (const line of lines) {
+        const paragraph = document.createElement("p");
+        paragraph.className = "speech-line";
+        paragraph.textContent = line;
+        fragment.append(paragraph);
+      }
+      $("speech-content").replaceChildren(fragment);
+    }
+
+    function refreshResult() {
+      const result = judgePair(rankings, pair[0], pair[1]);
+      $("judge-result").classList.toggle("has-result", Boolean(result));
+      $("score-display").hidden = !result;
+      $("waiting-display").hidden = Boolean(result);
+      $("defeat-image").hidden = !result || result.rating.grade !== "C";
+      $("sprite-window").hidden = Boolean(result && result.rating.grade === "C");
+      if (!result) {
+        delete document.documentElement.dataset.rating;
+        document.documentElement.style.setProperty("--frame-time", `${7 * 4 / 60}s`);
+        $("rating-letter").textContent = "?";
+        $("live-tag").textContent = rankingIsComplete() ? "選択待ち" : "準備中";
+        const complete = rankingIsComplete();
+        $("waiting-heading").textContent = complete ? "どの2ステで潜る？" : "まずは順位付け！";
+        $("waiting-copy").textContent = complete ? "上のプルダウンで2ステージを選択。" : "あなたのステージの好みを教えてね。";
+        $("calculation").textContent = `${BASE_POINTS} − ？ − ？ ＝ ？`;
+        setSpeech(complete ? ["今日の2ステージを", "選んでみるわかば！"] : ["まずは、好きな順に", "ステージを並べるわかば！"]);
+        setEffects("");
+        return;
+      }
+      const { score, firstRank, secondRank, rating } = result;
+      document.documentElement.dataset.rating = rating.grade;
+      document.documentElement.style.setProperty("--frame-time", `${rating.frames * 4 / 60}s`);
+      $("rating-letter").textContent = rating.grade;
+      $("score-number").textContent = score;
+      $("live-tag").textContent = "判定完了";
+      $("calculation").textContent = `${BASE_POINTS} − ${firstRank} − ${secondRank} ＝ ${score}`;
+      setSpeech(rating.lines);
+      setEffects(rating.grade);
+      announce(`${pair[0]}は${firstRank}位、${pair[1]}は${secondRank}位。${score}点、${rating.grade}評価。${rating.lines.join(" ")}`);
+    }
+
+    function refresh() {
+      refreshRankings();
+      refreshPair();
+      refreshResult();
+    }
+
+    pairSelects.forEach((select, index) => {
+      select.addEventListener("change", () => {
+        const value = select.value;
+        const error = value && value === pair[1 - index] ? "同じステージが選ばれています。異なる2ステージを選んでください。" : value && !stageSet.has(value) ? "一覧からステージを選んでください。" : "";
+        $("pair-error").textContent = error;
+        $("pair-error").hidden = !error;
+        if (error) { select.value = pair[index]; return; }
+        pair[index] = value;
+        randomizeBubble($("result-speech"));
+        refreshPair();
+        refreshResult();
+        saveState();
+      });
+    });
+
+    $("fill-empty").addEventListener("click", () => {
+      const used = new Set(rankings.filter(Boolean));
+      const remaining = stageNames.filter((name) => !used.has(name));
+      let next = 0;
+      rankings = rankings.map((name) => name || remaining[next++]);
+      showRankingError();
+      refresh();
+      saveState();
+      announce(`空いていた${next}枠を50音順で埋めました。順位は各プルダウンで変更できます。`);
+    });
+
+    $("go-judge").addEventListener("click", () => {
+      $("judgement").scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "start" });
+      pairSelects[0].focus({ preventScroll: true });
+    });
+
+    $("reset-ranking").addEventListener("click", () => $("reset-dialog").showModal());
+    $("reset-dialog").addEventListener("close", () => {
+      if ($("reset-dialog").returnValue !== "reset") return;
+      rankings = Array(STAGES.length).fill("");
+      pair = ["", ""];
+      $("pair-error").hidden = true;
+      showRankingError();
+      refresh();
+      saveState();
+      rankingSelects[0].focus();
+      announce("順位をリセットしました。");
+    });
+
+    // 横長で読みやすい、6〜8頂点のランダムな多角形フキダシ。
+    function randomizeBubble(element) {
+      const templates = [
+        [[7, 0], [91, 3], [100, 22], [94, 100], [8, 96], [0, 67]],
+        [[6, 5], [87, 0], [100, 19], [98, 77], [86, 100], [4, 91], [0, 28]],
+        [[8, 2], [89, 0], [100, 20], [98, 78], [86, 100], [10, 97], [0, 77], [1, 23]]
+      ];
+      const points = templates[Math.floor(Math.random() * templates.length)].map(([x, y]) => `${Math.max(0, Math.min(100, x + (Math.random() - .5) * 4)).toFixed(1)}% ${Math.max(0, Math.min(100, y + (Math.random() - .5) * 4)).toFixed(1)}%`);
+      element.style.setProperty("--cut", `polygon(${points.join(",")})`);
+    }
+    document.querySelectorAll("[data-polygon]").forEach(randomizeBubble);
+
+    // 実画像のサイズから1コマの縦横比を決める。元画像の解像度が変わっても横4分割を保つ。
+    function sizeSprite() {
+      const sheet = $("run-sheet");
+      if (sheet.naturalWidth && sheet.naturalHeight) $("sprite-window").style.setProperty("--sprite-ratio", (sheet.naturalWidth / 4) / sheet.naturalHeight);
+    }
+    $("run-sheet").addEventListener("load", sizeSprite);
+    [$("run-sheet"), $("defeat-image")].forEach((image) => image.addEventListener("error", () => { $("asset-error").hidden = false; }));
+    sizeSprite();
+
+    // 背景の紙片・雨・黒い破片。虹は単色の紙片を使う。
+    const effectCanvas = $("effects");
+    const context = effectCanvas.getContext("2d");
+    const rainbowColors = ["#ff5a83", "#ff9a35", "#f3d929", "#a2de20", "#27b8bd", "#577cef", "#a56be8"];
+    let effectGrade = "";
+    let effectFrame = 0;
+    let effectLastTime = 0;
+    let effectWidth = 0;
+    let effectHeight = 0;
+    let particles = [];
+
+    function resizeEffects() {
+      effectWidth = window.innerWidth;
+      effectHeight = window.innerHeight;
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      effectCanvas.width = Math.round(effectWidth * ratio);
+      effectCanvas.height = Math.round(effectHeight * ratio);
+      if (context) context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      if (effectGrade) createParticles();
+    }
+
+    function createParticles() {
+      const count = effectGrade === "X" ? 55 : 32;
+      particles = Array.from({ length: count }, (_, index) => ({
+        x: Math.random() * effectWidth, y: Math.random() * effectHeight,
+        size: 5 + Math.random() * 13, speed: 32 + Math.random() * 55,
+        angle: Math.random() * Math.PI * 2, drift: (Math.random() - .5) * 22,
+        color: effectGrade === "X" ? rainbowColors[index % rainbowColors.length] : effectGrade === "B" ? ["#6865ac", "#8b7cbd", "#5a78ba"][index % 3] : ["#53406e", "#324260", "#262238"][index % 3]
+      }));
+    }
+
+    function drawEffects(time) {
+      effectFrame = 0;
+      if (!context || !effectGrade || reducedMotion.matches || document.hidden) return;
+      const delta = Math.min((time - (effectLastTime || time)) / 1000, .05);
+      effectLastTime = time;
+      context.clearRect(0, 0, effectWidth, effectHeight);
+      for (const particle of particles) {
+        particle.y += particle.speed * delta;
+        particle.x += particle.drift * delta;
+        particle.angle += delta * .65;
+        if (particle.y > effectHeight + 25) { particle.y = -25; particle.x = Math.random() * effectWidth; }
+        context.save();
+        context.globalAlpha = effectGrade === "X" ? .8 : .43;
+        context.translate(particle.x, particle.y);
+        context.rotate(effectGrade === "X" ? particle.angle : -.22);
+        context.fillStyle = particle.color;
+        context.beginPath();
+        if (effectGrade === "B") {
+          context.moveTo(0, -particle.size); context.lineTo(3, particle.size); context.lineTo(-2, particle.size * .7);
+        } else {
+          const size = particle.size;
+          context.moveTo(-size * .5, -size * .4); context.lineTo(size * .3, -size * .6); context.lineTo(size * .65, 0);
+          context.lineTo(size * .3, size * .5); context.lineTo(-size * .45, size * .4); context.lineTo(-size * .65, 0);
+        }
+        context.closePath(); context.fill(); context.restore();
+      }
+      effectFrame = requestAnimationFrame(drawEffects);
+    }
+
+    function setEffects(grade) {
+      const next = ["X", "B", "C"].includes(grade) ? grade : "";
+      if (effectGrade === next) return;
+      effectGrade = next;
+      cancelAnimationFrame(effectFrame);
+      effectFrame = 0;
+      effectLastTime = 0;
+      if (context) context.clearRect(0, 0, effectWidth, effectHeight);
+      if (!next || !context) return;
+      createParticles();
+      if (!reducedMotion.matches && !document.hidden) effectFrame = requestAnimationFrame(drawEffects);
+    }
+
+    function resumeEffects() {
+      cancelAnimationFrame(effectFrame);
+      effectFrame = 0;
+      effectLastTime = 0;
+      if (context) context.clearRect(0, 0, effectWidth, effectHeight);
+      if (effectGrade && context && !reducedMotion.matches && !document.hidden) effectFrame = requestAnimationFrame(drawEffects);
+    }
+    window.addEventListener("resize", resizeEffects);
+    document.addEventListener("visibilitychange", resumeEffects);
+    reducedMotion.addEventListener("change", resumeEffects);
+    resizeEffects();
+    loadState();
+    buildRanking();
+    refresh();
+  </script>
+</body>
+</html>
