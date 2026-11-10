@@ -82,7 +82,6 @@
       background: var(--lime); clip-path: polygon(0 0, 100% 36%, 100% 100%, 0 65%);
     }
     .seed-mark::after { left: 7px; transform: scaleX(-1); }
-    .topline-note { color: #c0c1b8; letter-spacing: .07em; }
     .shell { max-width: 1248px; margin: 0 auto; padding: 0 24px; }
     .hero {
       min-height: 170px; padding: 28px 0 31px; display: flex; align-items: center;
@@ -285,7 +284,6 @@
     }
     @media (max-width: 760px) {
       .topline { padding: 10px 18px; min-height: 39px; font-size: 9px; }
-      .topline-note { display: none; }
       .shell { padding: 0 18px; }
       .hero { min-height: 0; padding: 29px 0 27px; gap: 14px; align-items: flex-start; }
       h1 { font-size: clamp(28px, 6.9vw, 46px); letter-spacing: -.075em; }
@@ -345,7 +343,6 @@
   <canvas id="effects" aria-hidden="true"></canvas>
   <div class="topline">
     <span class="topline-brand"><i class="seed-mark" aria-hidden="true"></i> WAKABA JUDGEMENT</span>
-    <span class="topline-note">ステージの好みは、わかばに聞け。</span>
   </div>
 
   <main class="shell">
@@ -390,7 +387,7 @@
       <div class="judge-column" id="judgement">
         <section class="panel judge-panel" aria-labelledby="judge-title">
           <header class="panel-heading judge-heading">
-            <div class="heading-line"><span class="step-number">02</span><h2 id="judge-title">今日の2ステを、ジャッジ！</h2></div>
+            <div class="heading-line"><span class="step-number">02</span><h2 id="judge-title">2ステをジャッジわかば！</h2></div>
           </header>
           <div class="judge-controls">
             <div class="pair-field">
@@ -433,7 +430,7 @@
       </div>
     </div>
 
-    <div class="bottom-tape" aria-hidden="true"><span>RANK YOUR STAGES</span><b>✦</b><span>CHOOSE YOUR TWO</span><b>✦</b><span>TRUST YOUR WAKABA</span><b>✦</b><span>RANK YOUR STAGES</span><b>✦</b><span>CHOOSE YOUR TWO</span></div>
+    <div class="bottom-tape" aria-hidden="true"><b>✦</b><span>WAKABA IGAI DEMO KOURYO DEKIMASU</span><b>✦</b></div>
     <footer><p>『スプラトゥーン』の非公式ファンサイトです。</p><p>WAKABA JUDGEMENT</p></footer>
     <p class="sr-only" id="announcer" role="status" aria-live="polite" aria-atomic="true"></p>
   </main>
