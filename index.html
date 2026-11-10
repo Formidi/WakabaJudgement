@@ -32,7 +32,6 @@
       --arena: #e7e9db;
       --bubble-paper: #fffef5;
       --bubble-ink: var(--ink);
-      --frame-time: .466667s;
       font-family: Wakaba, "Noto Sans JP", sans-serif;
       font-weight: 700;
       background: var(--page);
@@ -86,11 +85,10 @@
     .topline-note { color: #c0c1b8; letter-spacing: .07em; }
     .shell { max-width: 1248px; margin: 0 auto; padding: 0 24px; }
     .hero {
-      min-height: 222px; padding: 38px 0 31px; display: flex; align-items: center;
+      min-height: 170px; padding: 28px 0 31px; display: flex; align-items: center;
       justify-content: space-between; gap: 26px; color: var(--hero-ink);
     }
     .hero-copy { position: relative; }
-    .eyebrow { font-size: 11px; letter-spacing: .14em; margin: 0 0 10px 4px; }
     h1 { margin: 0; font-size: clamp(30px, 4.4vw, 57px); letter-spacing: -.075em; line-height: 1.32; }
     .logo-sticker {
       display: inline-block; position: relative; isolation: isolate; padding: 0 13px 5px 8px;
@@ -100,19 +98,10 @@
       content: ""; position: absolute; inset: -5px -2px 0; z-index: -1; background: var(--lime);
       clip-path: polygon(5% 5%, 88% 0, 100% 20%, 95% 87%, 81% 100%, 0 95%, 2% 30%);
     }
-    .hero-description { font-size: 12px; margin: 16px 0 0 4px; line-height: 1.9; }
     .hero-aside { flex: 0 0 252px; position: relative; margin-right: 10px; }
     .speech { position: relative; filter: drop-shadow(4px 5px 0 var(--ink)); }
-    .speech-shape { position: absolute; inset: 0; background: var(--ink); clip-path: var(--cut, polygon(7% 0, 91% 3%, 100% 19%, 98% 79%, 87% 100%, 9% 95%, 0 76%, 1% 21%)); }
-    .speech-shape::before { content: ""; position: absolute; inset: 3px; clip-path: inherit; background: var(--bubble-paper); }
-    .speech::after {
-      content: ""; position: absolute; width: 38px; height: 30px; left: 32%; bottom: -19px;
-      background: var(--ink); clip-path: polygon(0 0, 100% 0, 12% 100%);
-    }
-    .speech::before {
-      content: ""; position: absolute; width: 29px; height: 25px; left: calc(32% + 4px); bottom: -12px;
-      background: var(--bubble-paper); z-index: 2; clip-path: polygon(0 0, 100% 0, 7% 100%);
-    }
+    .speech-shape { position: absolute; inset: 0; width: 100%; height: calc(100% + 38px); overflow: visible; pointer-events: none; }
+    .speech-shape path { fill: var(--bubble-paper); stroke: var(--ink); stroke-width: 3px; stroke-linejoin: miter; }
     .speech-content { position: relative; z-index: 3; padding: 22px 25px; color: var(--bubble-ink); }
     .hero-speech { --bubble-paper: var(--pink); transform: rotate(5deg); text-align: center; }
     .hero-speech .speech-content { padding: 26px 24px; font-size: 20px; line-height: 1.65; letter-spacing: -.035em; }
@@ -123,7 +112,7 @@
     }
     .app-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 25px; align-items: start; }
     .panel { background: var(--paper); border: 3px solid var(--ink); box-shadow: 5px 6px 0 var(--ink); min-width: 0; }
-    .panel-heading { padding: 20px 22px 16px; border-bottom: 2px solid var(--ink); }
+    .panel-heading { padding: 18px 22px; border-bottom: 2px solid var(--ink); }
     .heading-line { display: flex; align-items: center; gap: 10px; }
     .step-number {
       font-size: 12px; letter-spacing: .06em; line-height: 1; padding: 9px 8px;
@@ -131,7 +120,6 @@
       clip-path: polygon(12% 0, 90% 0, 100% 15%, 93% 96%, 8% 100%, 0 83%);
     }
     h2 { font-size: 19px; margin: 0; letter-spacing: -.045em; line-height: 1.4; }
-    .panel-description { font-size: 11px; margin: 8px 0 0; line-height: 1.8; }
     .ranking-heading { background: var(--lime); }
     .ranking-meta { padding: 16px 20px 13px; }
     .progress-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; }
@@ -189,8 +177,6 @@
     .button-lime { background: var(--lime); color: var(--ink); }
     .ranking-cta { width: 100%; justify-content: space-between; }
     .arrow { font-size: 19px; line-height: 1; }
-    .save-note { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 11px 0 0; font-size: 9px; color: #676b5f; }
-    .save-dot { display: inline-block; width: 5px; height: 5px; background: #697e3a; }
     .message { margin: 0 20px 14px; border: 2px solid #b94459; background: #ffe8ed; font-size: 11px; padding: 10px 12px; }
     .judge-column { position: sticky; top: 20px; min-width: 0; scroll-margin-top: 20px; }
     .judge-heading { background: var(--pink); }
@@ -201,16 +187,9 @@
     .pair-label { font-size: 12px; color: #6d6b66; }
     .pair-select { width: 100%; padding: 11px 27px 11px 10px; border: 2px solid var(--ink); background-color: #fffef8; font-size: 12px; }
     .pair-rank { font-size: 10px; text-align: center; background: #e7e9dd; padding: 6px 2px; }
-    .pair-hint { margin: 11px 0 0; font-size: 10px; color: #65685b; }
     .pair-error { margin: 11px 0 0; font-size: 11px; color: #a02347; }
     .judge-result { padding: 18px 20px 19px; position: relative; }
-    .result-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .mini-label { font-size: 9px; letter-spacing: .15em; }
-    .live-tag { font-size: 9px; border: 1px solid #979b89; padding: 3px 7px; background: var(--paper); }
-    .live-tag::before { content: ""; display: inline-block; width: 5px; height: 5px; margin-right: 5px; background: #9b9e91; }
-    .has-result .live-tag { border-color: var(--ink); background: var(--accent); }
-    .has-result .live-tag::before { background: var(--ink); }
-    .result-summary { display: flex; align-items: center; gap: 15px; margin: 15px 0 8px; min-height: 83px; }
+    .result-summary { display: flex; align-items: center; gap: 15px; margin: 0 0 18px; min-height: 83px; }
     .rating-stamp {
       width: 88px; height: 85px; display: flex; align-items: baseline; justify-content: center; gap: 3px; flex: 0 0 88px;
       background: var(--accent); color: var(--ink); transform: rotate(-6deg);
@@ -221,47 +200,25 @@
     .rating-stamp small { font-size: 10px; }
     .score-number { font-size: 49px; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -.06em; }
     .score-unit { font-size: 14px; margin-left: 5px; }
-    .score-label { font-size: 9px; color: #6d7063; margin: 4px 0 0; }
     .waiting-heading { font-size: 20px; line-height: 1.6; margin: 0; letter-spacing: -.04em; }
-    .waiting-copy { font-size: 10px; color: #65685b; margin: 4px 0 0; }
-    .calculation { background: #e9ebdf; padding: 8px 10px; font-size: 11px; display: flex; justify-content: space-between; gap: 4px; margin: 12px 0 15px; }
-    .calculation-detail { font-variant-numeric: tabular-nums; }
     .arena { position: relative; background: var(--arena); min-height: 313px; overflow: hidden; border: 2px solid var(--ink); isolation: isolate; }
     .arena::before { content: ""; position: absolute; inset: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Cpath d='M0 18L18 0' stroke='%23191a1e' stroke-opacity='.08' stroke-width='1'/%3E%3C/svg%3E"); }
     .arena-mark { position: absolute; width: 145px; height: 145px; background: var(--accent); bottom: 16px; right: -7px; transform: rotate(12deg); clip-path: polygon(18% 0, 82% 5%, 100% 29%, 91% 83%, 68% 100%, 9% 86%, 0 32%); }
     .arena-mark::after { content: ""; position: absolute; width: 78px; height: 25px; left: 9px; bottom: 18px; background: var(--ink); opacity: .1; transform: rotate(-20deg); }
-    .arena-deco { position: absolute; width: 48px; height: 45px; left: 15px; bottom: 42px; transform: rotate(-16deg); }
+    .arena-deco { position: absolute; width: 38px; height: 45px; right: calc(100% - 12px); top: 35%; transform: rotate(-16deg); }
     .arena-deco::before, .arena-deco::after { content: ""; position: absolute; width: 11px; height: 25px; background: var(--ink); clip-path: polygon(0 0, 100% 0, 75% 100%, 14% 92%); }
     .arena-deco::after { left: 20px; height: 36px; top: -5px; transform: rotate(17deg); }
     .result-speech { margin: 15px 14px 0; z-index: 3; filter: drop-shadow(2px 3px 0 var(--ink)); }
-    .result-speech::after { left: 62%; bottom: -17px; }
-    .result-speech::before { left: calc(62% + 4px); bottom: -10px; }
     .result-speech .speech-content { padding: 20px 22px 22px; font-size: 13px; line-height: 1.8; letter-spacing: -.025em; overflow-wrap: anywhere; }
     .speech-line { margin: 0; }
     .speech-line + .speech-line { margin-top: 3px; }
-    .character { position: relative; width: 190px; margin: 12px 18px 0 auto; z-index: 2; }
+    .character { position: relative; width: 190px; margin: 34px 18px 8px auto; z-index: 2; }
     .sprite-flip { transform-origin: center; }
     .sprite-window { width: 100%; aspect-ratio: var(--sprite-ratio, 1); overflow: hidden; }
-    .run-sheet { display: block; width: 400%; height: 100%; max-width: none; animation: run-frames var(--frame-time) steps(4, end) infinite; }
+    .run-sheet { display: block; width: 400%; height: 100%; max-width: none; will-change: transform; }
     .defeat-image { display: block; width: 100%; height: auto; }
     .character-ground { position: absolute; width: 155px; height: 14px; bottom: 9px; left: 20px; background: var(--ink); opacity: .13; z-index: -1; clip-path: polygon(10% 8%, 82% 0, 100% 48%, 87% 90%, 7% 100%, 0 54%); }
     .asset-error { margin: 14px; font-size: 10px; background: var(--paper); border: 1px solid var(--ink); padding: 8px; position: relative; }
-    @keyframes run-frames { to { transform: translateX(-100%); } }
-    @keyframes small-shake {
-      0%, 100% { transform: translate(-6px, -4px); }
-      17% { transform: translate(8px, 3px); }
-      34% { transform: translate(-4px, 7px); }
-      51% { transform: translate(6px, -6px); }
-      68% { transform: translate(-8px, 2px); }
-      85% { transform: translate(3px, 6px); }
-    }
-    .scoring-guide { margin-top: 19px; font-size: 10px; }
-    .scoring-guide summary { cursor: pointer; padding: 1px 0 8px; }
-    .scoring-guide table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: left; }
-    .scoring-guide td, .scoring-guide th { border-top: 1px solid #d3d6c8; padding: 7px 8px; }
-    .scoring-guide th { font-size: 9px; color: #626658; }
-    .guide-grade { font-style: italic; font-size: 13px; }
-    .scoring-note { font-size: 9px; line-height: 1.9; color: #626658; margin: 8px 0 0; }
     .bottom-tape { margin: 34px 0 0; border-top: 2px solid var(--hero-ink); border-bottom: 2px solid var(--hero-ink); padding: 10px 0; overflow: hidden; color: var(--hero-ink); white-space: nowrap; font-size: 11px; letter-spacing: .11em; }
     .bottom-tape span { padding: 0 15px; }
     .bottom-tape b { color: #7657b8; font-size: 15px; }
@@ -279,8 +236,7 @@
     :root[data-rating="X"] { --accent: #e1ff35; --arena: #f7f3cb; animation: rainbow-page 8.4s steps(1, end) infinite; }
     :root[data-rating="X"] .rating-stamp,
     :root[data-rating="X"] .arena-mark,
-    :root[data-rating="X"] .judge-heading,
-    :root[data-rating="X"] .live-tag { animation: rainbow-accent 5.6s steps(1, end) infinite; }
+    :root[data-rating="X"] .judge-heading { animation: rainbow-accent 5.6s steps(1, end) infinite; }
     :root[data-rating="X"] .judge-panel { box-shadow: 5px 6px 0 #9b5df4, 10px 12px 0 #ff77a4, 15px 18px 0 #54d8df; }
     :root[data-rating="S"] { --accent: #e1ff35; --arena: #f0f5cc; }
     :root[data-rating="A"] { --accent: #c2ec60; --arena: #e7eddb; }
@@ -296,7 +252,6 @@
     :root[data-rating="C"] .arena-mark { background: #332b58; }
     :root[data-rating="C"] .arena-deco::before,
     :root[data-rating="C"] .arena-deco::after { background: #6d5e98; }
-    :root[data-rating="C"] .defeat-image { animation: small-shake .32s steps(1, end) infinite; }
     :root[data-rating="C"] .hero-speech { --bubble-ink: var(--ink); --bubble-paper: #b3a1d3; }
     @keyframes rainbow-page {
       0%, 100% { background-color: #f1d4df; }
@@ -336,13 +291,10 @@
       h1 { font-size: clamp(28px, 6.9vw, 46px); letter-spacing: -.075em; }
       .hero-copy { width: 100%; }
       .hero-aside { display: none; }
-      .eyebrow { font-size: 9px; margin-bottom: 12px; letter-spacing: .11em; }
-      .hero-description { font-size: 10px; margin-top: 13px; }
       .app-grid { grid-template-columns: 1fr; gap: 24px; }
       .panel { box-shadow: 4px 5px 0 var(--ink); }
       .panel-heading { padding: 17px 18px 14px; }
       h2 { font-size: 18px; }
-      .panel-description { font-size: 10px; }
       .ranking-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7px 10px; }
       .rank-row:nth-child(-n+12) { grid-column: 1; }
       .rank-row:nth-child(n+13) { grid-column: 2; }
@@ -365,7 +317,7 @@
       .pair-select { font-size: 13px; }
       .arena { min-height: 302px; }
       .result-speech .speech-content { font-size: 14px; padding: 22px 27px; }
-      .character { width: 185px; margin-right: 32px; margin-top: 6px; }
+      .character { width: 185px; margin-right: 32px; margin-top: 34px; }
       .bottom-tape { margin-top: 28px; font-size: 9px; }
       footer { align-items: flex-start; font-size: 8px; flex-direction: column; gap: 4px; }
     }
@@ -380,7 +332,6 @@
       .result-speech { margin-left: 10px; margin-right: 10px; }
       .result-speech .speech-content { font-size: 12px; padding: 21px 20px; }
       .score-number { font-size: 46px; }
-      .hero-description br { display: none; }
       .ranking-toolbar { gap: 14px; }
       .ranking-toolbar .text-button { font-size: 10px; }
     }
@@ -400,14 +351,12 @@
   <main class="shell">
     <header class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">YOUR RANKING. WAKABA'S JUDGEMENT.</p>
         <h1><span class="logo-sticker">わかば</span>ジャッジメント</h1>
-        <p class="hero-description">ステージを好きな順に並べて、今日の2ステージを選ぶだけ。<br>潜るか、休むか。わかばがジャッジするわかば！</p>
       </div>
       <div class="hero-aside" aria-hidden="true">
         <i class="hero-spark"></i>
         <div class="speech hero-speech" data-polygon>
-          <div class="speech-shape"></div>
+          <svg class="speech-shape" aria-hidden="true" focusable="false" preserveAspectRatio="none"><path></path></svg>
           <div class="speech-content"><span class="tiny">LET'S CHECK!</span>今日の2ステ、<br>潜って大丈夫？</div>
         </div>
       </div>
@@ -419,7 +368,6 @@
       <section class="panel ranking-panel" id="ranking" aria-labelledby="ranking-title">
         <header class="panel-heading ranking-heading">
           <div class="heading-line"><span class="step-number">01</span><h2 id="ranking-title">好きな順に、並べるわかば！</h2></div>
-          <p class="panel-description">1位は得意なステージ、24位は苦手なステージ。<br>プルダウンは50音順。選んだステージは、ほかの順位から消えます。</p>
         </header>
         <div class="ranking-meta">
           <div class="progress-line">
@@ -436,7 +384,6 @@
         <div class="ranking-grid" id="ranking-grid"></div>
         <div class="ranking-bottom">
           <button class="button ranking-cta" id="go-judge" type="button" disabled><span id="cta-label">24ステージを選ぶと判定できます</span><span class="arrow" aria-hidden="true">↗</span></button>
-          <p class="save-note"><i class="save-dot" aria-hidden="true"></i><span id="save-note">順位はこのブラウザーに自動保存されます</span></p>
         </div>
       </section>
 
@@ -444,39 +391,35 @@
         <section class="panel judge-panel" aria-labelledby="judge-title">
           <header class="panel-heading judge-heading">
             <div class="heading-line"><span class="step-number">02</span><h2 id="judge-title">今日の2ステを、ジャッジ！</h2></div>
-            <p class="panel-description">持ち点50から、2ステージの順位を引いて判定。</p>
           </header>
           <div class="judge-controls">
             <div class="pair-field">
               <label class="pair-label" for="stage-one"><span aria-hidden="true">A</span><span class="sr-only">1つ目のステージ</span></label>
-              <select class="pair-select" id="stage-one" disabled aria-describedby="pair-hint"><option value="">ステージを選択</option></select>
+              <select class="pair-select" id="stage-one" disabled><option value="">ステージを選択</option></select>
               <span class="pair-rank" id="rank-one">— 位</span>
             </div>
             <div class="pair-field">
               <label class="pair-label" for="stage-two"><span aria-hidden="true">B</span><span class="sr-only">2つ目のステージ</span></label>
-              <select class="pair-select" id="stage-two" disabled aria-describedby="pair-hint"><option value="">ステージを選択</option></select>
+              <select class="pair-select" id="stage-two" disabled><option value="">ステージを選択</option></select>
               <span class="pair-rank" id="rank-two">— 位</span>
             </div>
-            <p class="pair-hint" id="pair-hint">先に、24ステージの順位を決めてください。</p>
             <p class="pair-error" id="pair-error" role="alert" hidden></p>
           </div>
 
           <div class="judge-result" id="judge-result">
-            <div class="result-head"><span class="mini-label">WAKABA'S VERDICT</span><span class="live-tag" id="live-tag">準備中</span></div>
             <div class="result-summary">
               <div id="rating-display" class="rating-stamp" aria-hidden="true"><span class="rating-letter" id="rating-letter">?</span><small>評価</small></div>
-              <div id="score-display" hidden><div><strong class="score-number" id="score-number">—</strong><span class="score-unit">点</span></div><p class="score-label">50点 − ステージの順位</p></div>
-              <div id="waiting-display"><p class="waiting-heading" id="waiting-heading">まずは順位付け！</p><p class="waiting-copy" id="waiting-copy">あなたのステージの好みを教えてね。</p></div>
+              <div id="score-display" hidden><strong class="score-number" id="score-number">—</strong><span class="score-unit">点</span></div>
+              <div id="waiting-display"><p class="waiting-heading" id="waiting-heading">まずは順位付け！</p></div>
             </div>
-            <div class="calculation"><span>計算式</span><span class="calculation-detail" id="calculation">50 − ？ − ？ ＝ ？</span></div>
             <div class="arena" id="arena">
               <div class="arena-mark" aria-hidden="true"></div>
-              <div class="arena-deco" aria-hidden="true"></div>
               <div class="speech result-speech" id="result-speech" data-polygon>
-                <div class="speech-shape"></div>
+                <svg class="speech-shape" aria-hidden="true" focusable="false" preserveAspectRatio="none"><path></path></svg>
                 <div class="speech-content" id="speech-content"><p class="speech-line">まずは、好きな順に</p><p class="speech-line">ステージを並べるわかば！</p></div>
               </div>
               <div class="character" id="character">
+                <div class="arena-deco" aria-hidden="true"></div>
                 <div class="character-ground" aria-hidden="true"></div>
                 <div class="sprite-flip">
                   <div class="sprite-window" id="sprite-window"><img class="run-sheet" id="run-sheet" src="img/Wakaba_Run.png" alt="走るわかば" width="1024" height="256" draggable="false"></div>
@@ -485,20 +428,6 @@
               </div>
               <p class="asset-error" id="asset-error" hidden>キャラクター画像を読み込めませんでした。imgフォルダー内の画像を確認してください。</p>
             </div>
-            <details class="scoring-guide">
-              <summary>点数と評価の目安</summary>
-              <table>
-                <thead><tr><th scope="col">評価</th><th scope="col">点数</th></tr></thead>
-                <tbody>
-                  <tr><td class="guide-grade">X</td><td>45〜50点</td></tr>
-                  <tr><td class="guide-grade">S</td><td>40〜44点</td></tr>
-                  <tr><td class="guide-grade">A</td><td>30〜39点</td></tr>
-                  <tr><td class="guide-grade">B</td><td>15〜29点</td></tr>
-                  <tr><td class="guide-grade">C</td><td>14点以下</td></tr>
-                </tbody>
-              </table>
-              <p class="scoring-note">異なる2ステージを選ぶため、実際の点数は3〜47点です。</p>
-            </details>
           </div>
         </section>
       </div>
@@ -593,7 +522,6 @@
 
     function storageFallback() {
       storageAvailable = false;
-      $("save-note").textContent = "自動保存できないため、再読み込みすると順位が消えます";
     }
 
     function saveState() {
@@ -713,7 +641,6 @@
         const rank = complete && pair[index] ? rankings.indexOf(pair[index]) + 1 : 0;
         $(index ? "rank-two" : "rank-one").textContent = rank ? `${rank}位` : "— 位";
       });
-      $("pair-hint").textContent = complete ? "2つ選ぶと、わかばが自動でジャッジします。" : "先に、24ステージの順位を決めてください。";
     }
 
     function setSpeech(lines) {
@@ -736,24 +663,19 @@
       $("sprite-window").hidden = Boolean(result && result.rating.grade === "C");
       if (!result) {
         delete document.documentElement.dataset.rating;
-        document.documentElement.style.setProperty("--frame-time", `${7 * 4 / 60}s`);
+        setCharacterMotion("A");
         $("rating-letter").textContent = "?";
-        $("live-tag").textContent = rankingIsComplete() ? "選択待ち" : "準備中";
         const complete = rankingIsComplete();
         $("waiting-heading").textContent = complete ? "どの2ステで潜る？" : "まずは順位付け！";
-        $("waiting-copy").textContent = complete ? "上のプルダウンで2ステージを選択。" : "あなたのステージの好みを教えてね。";
-        $("calculation").textContent = `${BASE_POINTS} − ？ − ？ ＝ ？`;
         setSpeech(complete ? ["今日の2ステージを", "選んでみるわかば！"] : ["まずは、好きな順に", "ステージを並べるわかば！"]);
         setEffects("");
         return;
       }
       const { score, firstRank, secondRank, rating } = result;
       document.documentElement.dataset.rating = rating.grade;
-      document.documentElement.style.setProperty("--frame-time", `${rating.frames * 4 / 60}s`);
+      setCharacterMotion(rating.grade);
       $("rating-letter").textContent = rating.grade;
       $("score-number").textContent = score;
-      $("live-tag").textContent = "判定完了";
-      $("calculation").textContent = `${BASE_POINTS} − ${firstRank} − ${secondRank} ＝ ${score}`;
       setSpeech(rating.lines);
       setEffects(rating.grade);
       announce(`${pair[0]}は${firstRank}位、${pair[1]}は${secondRank}位。${score}点、${rating.grade}評価。${rating.lines.join(" ")}`);
@@ -809,17 +731,101 @@
       announce("順位をリセットしました。");
     });
 
-    // 横長で読みやすい、6〜8頂点のランダムな多角形フキダシ。
+    // 本体と尖りを1本の輪郭で描き、継ぎ目の線や塗りの食い込みをなくす。
+    const bubbleShapes = new WeakMap();
+
+    function drawBubble(element) {
+      const shape = element.querySelector(".speech-shape");
+      const template = bubbleShapes.get(element);
+      const width = element.clientWidth;
+      const height = element.clientHeight;
+      if (!shape || !template || !width || !height) return;
+      const points = template.map(([x, y]) => [width * x / 100, height * y / 100]);
+      const anchor = width * (element.classList.contains("result-speech") ? .68 : .34);
+      const halfBase = 17;
+      const outline = [];
+      for (let index = 0; index < points.length; index++) {
+        const point = points[index];
+        const next = points[(index + 1) % points.length];
+        outline.push(point);
+        if (point[0] >= anchor + halfBase && next[0] <= anchor - halfBase && point[1] > height * .65 && next[1] > height * .65) {
+          const edgeY = (x) => point[1] + (next[1] - point[1]) * (x - point[0]) / (next[0] - point[0]);
+          outline.push(
+            [anchor + halfBase, edgeY(anchor + halfBase)],
+            [anchor - 6, Math.max(edgeY(anchor + halfBase), edgeY(anchor - halfBase)) + 30],
+            [anchor - halfBase, edgeY(anchor - halfBase)]
+          );
+        }
+      }
+      shape.setAttribute("viewBox", `0 0 ${width} ${height + 38}`);
+      shape.querySelector("path").setAttribute("d", outline.map(([x, y], index) => `${index ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`).join(" ") + " Z");
+    }
+
+    // 本体は6〜8頂点。選択を変えるたびに形を少し変える。
     function randomizeBubble(element) {
       const templates = [
         [[7, 0], [91, 3], [100, 22], [94, 100], [8, 96], [0, 67]],
         [[6, 5], [87, 0], [100, 19], [98, 77], [86, 100], [4, 91], [0, 28]],
         [[8, 2], [89, 0], [100, 20], [98, 78], [86, 100], [10, 97], [0, 77], [1, 23]]
       ];
-      const points = templates[Math.floor(Math.random() * templates.length)].map(([x, y]) => `${Math.max(0, Math.min(100, x + (Math.random() - .5) * 4)).toFixed(1)}% ${Math.max(0, Math.min(100, y + (Math.random() - .5) * 4)).toFixed(1)}%`);
-      element.style.setProperty("--cut", `polygon(${points.join(",")})`);
+      const points = templates[Math.floor(Math.random() * templates.length)].map(([x, y]) => [Math.max(0, Math.min(100, x + (Math.random() - .5) * 4)), Math.max(0, Math.min(100, y + (Math.random() - .5) * 4))]);
+      bubbleShapes.set(element, points);
+      drawBubble(element);
     }
-    document.querySelectorAll("[data-polygon]").forEach(randomizeBubble);
+    const bubbleObserver = new ResizeObserver((entries) => entries.forEach(({ target }) => drawBubble(target)));
+    document.querySelectorAll("[data-polygon]").forEach((element) => {
+      randomizeBubble(element);
+      bubbleObserver.observe(element);
+    });
+
+    // CSSアニメーションの停止設定に依存せず、60Fを1秒として横4コマを送る。
+    const characterMotion = { grade: "", frames: 7, elapsed: 0, lastTime: null, request: 0, drawnFrame: -1 };
+    const shakeOffsets = [[-6, -4], [8, 3], [-4, 7], [6, -6], [-8, 2], [3, 6]];
+
+    function paintCharacter() {
+      const defeat = characterMotion.grade === "C";
+      const interval = defeat ? 50 : characterMotion.frames * 1000 / 60;
+      const frame = Math.floor((characterMotion.elapsed + .000001) / interval) % (defeat ? shakeOffsets.length : 4);
+      if (frame === characterMotion.drawnFrame) return;
+      characterMotion.drawnFrame = frame;
+      if (defeat) {
+        const [x, y] = shakeOffsets[frame];
+        $("defeat-image").style.transform = `translate(${x}px, ${y}px)`;
+      } else {
+        $("run-sheet").style.transform = `translateX(${-frame * 25}%)`;
+      }
+    }
+
+    function animateCharacter(time) {
+      characterMotion.request = 0;
+      if (document.hidden) return;
+      if (characterMotion.lastTime !== null) characterMotion.elapsed += Math.min(Math.max(time - characterMotion.lastTime, 0), 250);
+      characterMotion.lastTime = time;
+      paintCharacter();
+      characterMotion.request = requestAnimationFrame(animateCharacter);
+    }
+
+    function resumeCharacter() {
+      cancelAnimationFrame(characterMotion.request);
+      characterMotion.request = 0;
+      characterMotion.lastTime = null;
+      if (!document.hidden) characterMotion.request = requestAnimationFrame(animateCharacter);
+    }
+
+    function setCharacterMotion(grade) {
+      if (characterMotion.grade !== grade) {
+        characterMotion.grade = grade;
+        characterMotion.frames = RATINGS.find((rating) => rating.grade === grade).frames;
+        characterMotion.elapsed = 0;
+        characterMotion.lastTime = null;
+        characterMotion.drawnFrame = -1;
+        $("run-sheet").style.transform = "translateX(0%)";
+        $("defeat-image").style.transform = "translate(0px, 0px)";
+        paintCharacter();
+      }
+      if (!characterMotion.request && !document.hidden) characterMotion.request = requestAnimationFrame(animateCharacter);
+    }
+    document.addEventListener("visibilitychange", resumeCharacter);
 
     // 実画像のサイズから1コマの縦横比を決める。元画像の解像度が変わっても横4分割を保つ。
     function sizeSprite() {
