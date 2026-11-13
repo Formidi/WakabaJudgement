@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#d3fc35">
-  <meta name="description" content="好きな順に24ステージを並べて、今日の2ステージをわかばがジャッジ。わかばジャッジメント。">
+  <meta name="description" content="好きな順に25ステージを並べて、今日の2ステージをわかばがジャッジ。わかばジャッジメント。">
   <title>わかばジャッジメント</title>
   <link rel="preload" href="fonts/NotoSansJP-Bold.otf" as="font" type="font/otf" crossorigin>
   <link rel="preload" href="img/Wakaba_Run.png" as="image">
@@ -120,40 +120,41 @@
     }
     h2 { font-size: 19px; margin: 0; letter-spacing: -.045em; line-height: 1.4; }
     .ranking-heading { background: var(--lime); }
-    .ranking-meta { padding: 16px 20px 13px; }
-    .progress-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; }
-    .progress-value { font-size: 11px; white-space: nowrap; }
-    .progress-value strong { font-size: 22px; line-height: 1; }
-    .progress-value span { color: #66695d; margin-left: 4px; }
-    .progress-track { height: 7px; background: #dcdfd1; margin-top: 10px; overflow: hidden; }
-    .progress-fill { height: 100%; width: 0; background: var(--ink); transition: width .22s ease; }
-    .ranking-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 12px 0 0; }
+    .ranking-meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 20px; font-size: 11px; }
     .text-button { border: 0; padding: 4px 0; background: none; font-size: 10px; text-decoration: underline; text-underline-offset: 3px; }
-    .text-button:disabled { opacity: .4; text-decoration: none; }
-    .text-button:hover:not(:disabled) { color: #6142b6; }
-    .ranking-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7px 11px; padding: 0 20px 19px; }
-    .rank-row { display: flex; align-items: stretch; gap: 0; min-width: 0; background: #fffef8; border: 1px solid #b7baac; }
-    .rank-row.is-set { border-color: var(--ink); }
-    .rank-index { min-width: 43px; width: 43px; padding: 9px 3px; text-align: center; display: flex; align-items: baseline; justify-content: center; gap: 2px; background: #e7e9dd; border-right: 1px solid #b7baac; font-size: 17px; line-height: 1.45; }
+    .text-button:hover { color: #6142b6; }
+    .ranking-grid {
+      display: grid; grid-auto-flow: column; grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(var(--rank-rows, 13), auto); gap: 7px 11px;
+      margin: 0; padding: 0 20px 19px; list-style: none;
+    }
+    .rank-row {
+      position: relative; display: flex; min-width: 0; min-height: 44px; align-items: stretch;
+      background: #fffef8; border: 1px solid var(--ink); cursor: grab; user-select: none;
+    }
+    .rank-index { flex: 0 0 43px; padding: 9px 3px; display: flex; align-items: baseline; justify-content: center; gap: 2px; background: var(--lime); border-right: 1px solid var(--ink); font-size: 17px; line-height: 1.45; }
     .rank-index small { font-size: 8px; }
-    .rank-row.is-set .rank-index { background: var(--lime); border-color: var(--ink); }
-    .rank-row:nth-child(n+7).is-set .rank-index { background: #e4efb2; }
-    .rank-row:nth-child(n+13).is-set .rank-index { background: #d6d0f0; }
-    .rank-row:nth-child(n+19).is-set .rank-index { background: #bbb1db; }
-    .rank-row:nth-child(-n+12) { grid-column: 1; }
-    .rank-row:nth-child(n+13) { grid-column: 2; }
-    .rank-row:nth-child(13) { grid-row: 1; }
-    .rank-row:nth-child(14) { grid-row: 2; }
-    .rank-row:nth-child(15) { grid-row: 3; }
-    .rank-row:nth-child(16) { grid-row: 4; }
-    .rank-row:nth-child(17) { grid-row: 5; }
-    .rank-row:nth-child(18) { grid-row: 6; }
-    .rank-row:nth-child(19) { grid-row: 7; }
-    .rank-row:nth-child(20) { grid-row: 8; }
-    .rank-row:nth-child(21) { grid-row: 9; }
-    .rank-row:nth-child(22) { grid-row: 10; }
-    .rank-row:nth-child(23) { grid-row: 11; }
-    .rank-row:nth-child(24) { grid-row: 12; }
+    .rank-row:nth-child(n+7) .rank-index { background: #e4efb2; }
+    .rank-row:nth-child(n+14) .rank-index { background: #d6d0f0; }
+    .rank-row:nth-child(n+20) .rank-index { background: #bbb1db; }
+    .rank-name { flex: 1; min-width: 0; align-self: center; padding: 7px 8px; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+    .rank-handle { flex: 0 0 37px; display: grid; place-items: center; padding: 0; border: 0; background: none; color: #6d6b66; cursor: grab; touch-action: none; }
+    .rank-handle::before {
+      content: ""; width: 3px; height: 3px; background: currentColor; transform: translate(-3px, -5px);
+      box-shadow: 6px 0 currentColor, 0 5px currentColor, 6px 5px currentColor, 0 10px currentColor, 6px 10px currentColor;
+    }
+    .rank-row:focus-visible { outline: 3px solid #5036d4; outline-offset: 2px; z-index: 1; }
+    .rank-row:hover .rank-handle { color: #5036d4; }
+    .ranking-grid.is-dragging .rank-row, .ranking-grid.is-dragging .rank-handle { cursor: grabbing; }
+    .rank-row.is-dragged { opacity: .38; }
+    .rank-row[data-drop-edge]::after { content: ""; position: absolute; inset-inline: -1px; height: 3px; background: #5036d4; pointer-events: none; z-index: 1; }
+    .rank-row[data-drop-edge="before"]::after { top: -6px; }
+    .rank-row[data-drop-edge="after"]::after { bottom: -6px; }
+    .rank-drag-preview {
+      position: fixed; z-index: 20; top: 0; left: 0; pointer-events: none;
+      padding: 9px 12px; background: var(--lime); border: 2px solid var(--ink);
+      box-shadow: 3px 4px 0 var(--ink); font-size: 12px; overflow-wrap: anywhere;
+    }
     select {
       appearance: none; -webkit-appearance: none; border-radius: 0; border: 0; min-width: 0;
       background-color: transparent; background-repeat: no-repeat; background-position: right 9px center; background-size: 9px 6px;
@@ -161,9 +162,6 @@
       cursor: pointer; text-overflow: ellipsis;
     }
     select:disabled { cursor: not-allowed; opacity: .54; }
-    .rank-select { width: 100%; flex: 1; padding: 8px 24px 8px 8px; font-size: 10px; line-height: 1.6; }
-    .rank-select:focus-visible { outline-offset: -3px; }
-    .rank-select:has(option:checked[value=""]) { color: #777b6e; }
     .ranking-bottom { padding: 0 20px 18px; }
     .button {
       border: 2px solid var(--ink); background: var(--ink); color: var(--paper); padding: 12px 18px;
@@ -270,13 +268,10 @@
       70% { background-color: #93b3ff; }
       84% { background-color: #d29aff; }
     }
-    @media (min-width: 1350px) { .rank-select { font-size: 11px; } }
     @media (max-width: 1080px) {
       .app-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; }
-      .ranking-grid { grid-template-columns: minmax(0, 1fr); padding-left: 16px; padding-right: 16px; gap: 7px; }
-      .rank-row:nth-child(n) { grid-column: auto; grid-row: auto; }
-      .rank-select { font-size: 12px; }
-      .rank-index { min-width: 48px; padding: 8px 3px; }
+      .ranking-grid { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; padding-inline: 16px; gap: 7px; }
+      .rank-index { flex-basis: 48px; padding: 8px 3px; }
       .hero-aside { flex-basis: 220px; }
       .hero-speech .speech-content { font-size: 18px; }
       .pair-select { font-size: 11px; }
@@ -293,23 +288,9 @@
       .panel { box-shadow: 4px 5px 0 var(--ink); }
       .panel-heading { padding: 17px 18px 14px; }
       h2 { font-size: 18px; }
-      .ranking-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7px 10px; }
-      .rank-row:nth-child(-n+12) { grid-column: 1; }
-      .rank-row:nth-child(n+13) { grid-column: 2; }
-      .rank-row:nth-child(13) { grid-row: 1; }
-      .rank-row:nth-child(14) { grid-row: 2; }
-      .rank-row:nth-child(15) { grid-row: 3; }
-      .rank-row:nth-child(16) { grid-row: 4; }
-      .rank-row:nth-child(17) { grid-row: 5; }
-      .rank-row:nth-child(18) { grid-row: 6; }
-      .rank-row:nth-child(19) { grid-row: 7; }
-      .rank-row:nth-child(20) { grid-row: 8; }
-      .rank-row:nth-child(21) { grid-row: 9; }
-      .rank-row:nth-child(22) { grid-row: 10; }
-      .rank-row:nth-child(23) { grid-row: 11; }
-      .rank-row:nth-child(24) { grid-row: 12; }
-      .rank-select { font-size: 10px; }
-      .rank-index { min-width: 38px; width: 38px; font-size: 16px; }
+      .ranking-meta { padding-inline: 16px; }
+      .ranking-grid { grid-auto-flow: column; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(var(--rank-rows, 13), auto); gap: 7px 10px; }
+      .rank-index { flex-basis: 38px; font-size: 16px; }
       .judge-column { position: static; scroll-margin-top: 14px; }
       .judge-controls, .judge-result { padding-left: 18px; padding-right: 18px; }
       .pair-select { font-size: 13px; }
@@ -320,18 +301,16 @@
       footer { align-items: flex-start; font-size: 8px; flex-direction: column; gap: 4px; }
     }
     @media (max-width: 470px) {
-      .ranking-grid { grid-template-columns: minmax(0, 1fr); gap: 7px; }
-      .rank-row:nth-child(n) { grid-column: auto; grid-row: auto; }
-      .rank-select { font-size: 16px; padding: 10px 28px 10px 10px; }
-      .rank-index { min-width: 48px; font-size: 18px; padding-top: 11px; }
+      .ranking-grid { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: 7px; }
+      .rank-name { font-size: 13px; }
+      .rank-handle { flex-basis: 44px; }
+      .rank-index { flex-basis: 43px; font-size: 18px; padding-top: 10px; }
       .rank-index small { font-size: 9px; }
       .pair-field { grid-template-columns: 16px minmax(0, 1fr) 38px; gap: 7px; }
       .pair-select { font-size: 16px; }
       .result-speech { margin-left: 10px; margin-right: 10px; }
       .result-speech .speech-content { font-size: 12px; padding: 21px 20px; }
       .score-number { font-size: 46px; }
-      .ranking-toolbar { gap: 14px; }
-      .ranking-toolbar .text-button { font-size: 10px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -367,20 +346,14 @@
           <div class="heading-line"><span class="step-number">01</span><h2 id="ranking-title">好きな順に、並べるわかば！</h2></div>
         </header>
         <div class="ranking-meta">
-          <div class="progress-line">
-            <span id="progress-label">まずは1位から選んでみよう。</span>
-            <span class="progress-value"><strong id="progress-count">0</strong><span>/ 24</span></span>
-          </div>
-          <div class="progress-track" role="progressbar" aria-label="順位付けの進捗" aria-valuemin="0" aria-valuemax="24" aria-valuenow="0" id="progress"><div class="progress-fill" id="progress-fill"></div></div>
-          <div class="ranking-toolbar">
-            <button class="text-button" id="fill-empty" type="button">空き枠を50音順で埋める ↗</button>
-            <button class="text-button" id="reset-ranking" type="button" disabled>順位をリセット</button>
-          </div>
+          <span>右端をドラッグして並べ替え</span>
+          <button class="text-button" id="reset-ranking" type="button">50音順に戻す</button>
         </div>
         <p class="message" id="ranking-error" role="alert" hidden></p>
-        <div class="ranking-grid" id="ranking-grid"></div>
+        <p class="sr-only" id="ranking-keys">上下キーで1つずつ、Home・Endキーで一番上・下に移動します。</p>
+        <ol class="ranking-grid" id="ranking-grid" role="list" aria-label="ステージの順位" aria-describedby="ranking-keys"></ol>
         <div class="ranking-bottom">
-          <button class="button ranking-cta" id="go-judge" type="button" disabled><span id="cta-label">24ステージを選ぶと判定できます</span><span class="arrow" aria-hidden="true">↗</span></button>
+          <button class="button ranking-cta" id="go-judge" type="button">この順位でジャッジする<span class="arrow" aria-hidden="true">↗</span></button>
         </div>
       </section>
 
@@ -392,12 +365,12 @@
           <div class="judge-controls">
             <div class="pair-field">
               <label class="pair-label" for="stage-one"><span aria-hidden="true">A</span><span class="sr-only">1つ目のステージ</span></label>
-              <select class="pair-select" id="stage-one" disabled><option value="">ステージを選択</option></select>
+              <select class="pair-select" id="stage-one"><option value="">ステージを選択</option></select>
               <span class="pair-rank" id="rank-one">— 位</span>
             </div>
             <div class="pair-field">
               <label class="pair-label" for="stage-two"><span aria-hidden="true">B</span><span class="sr-only">2つ目のステージ</span></label>
-              <select class="pair-select" id="stage-two" disabled><option value="">ステージを選択</option></select>
+              <select class="pair-select" id="stage-two"><option value="">ステージを選択</option></select>
               <span class="pair-rank" id="rank-two">— 位</span>
             </div>
             <p class="pair-error" id="pair-error" role="alert" hidden></p>
@@ -407,13 +380,13 @@
             <div class="result-summary">
               <div id="rating-display" class="rating-stamp" aria-hidden="true"><span class="rating-letter" id="rating-letter">?</span><small>評価</small></div>
               <div id="score-display" hidden><strong class="score-number" id="score-number">—</strong><span class="score-unit">点</span></div>
-              <div id="waiting-display"><p class="waiting-heading" id="waiting-heading">まずは順位付け！</p></div>
+              <div id="waiting-display"><p class="waiting-heading">どの2ステで潜る？</p></div>
             </div>
             <div class="arena" id="arena">
               <div class="arena-mark" aria-hidden="true"></div>
               <div class="speech result-speech" id="result-speech" data-polygon>
                 <svg class="speech-shape" aria-hidden="true" focusable="false" preserveAspectRatio="none"><path></path></svg>
-                <div class="speech-content" id="speech-content"><p class="speech-line">まずは、好きな順に</p><p class="speech-line">ステージを並べるわかば！</p></div>
+                <div class="speech-content" id="speech-content"><p class="speech-line">今日の2ステージを</p><p class="speech-line">選んでみるわかば！</p></div>
               </div>
               <div class="character" id="character">
                 <div class="arena-deco" aria-hidden="true"></div>
@@ -437,7 +410,7 @@
 
   <dialog id="reset-dialog" aria-labelledby="reset-title" aria-describedby="reset-description">
     <h2 id="reset-title">順位をリセットしますか？</h2>
-    <p id="reset-description">保存した24ステージの順位と、判定中の2ステージを未選択に戻します。</p>
+    <p id="reset-description">25ステージの順位を50音順に戻し、判定中の2ステージの選択を解除します。</p>
     <form method="dialog" class="dialog-actions"><button class="button button-outline" value="cancel">戻る</button><button class="button button-lime" value="reset">リセットする</button></form>
   </dialog>
 
@@ -466,6 +439,7 @@
       { name: "キンメダイ美術館", kana: "きんめだいびじゅつかん" },
       { name: "クサヤ温泉", kana: "くさやおんせん" },
       { name: "チョウザメ造船", kana: "ちょうざめぞうせん" },
+      { name: "デカライン高架下", kana: "でからいんこうかした" },
       { name: "コンブトラック", kana: "こんぶとらっく" },
       { name: "ユノハナ大渓谷", kana: "ゆのはなだいけいこく" },
       { name: "ザトウマーケット", kana: "ざとうまーけっと" },
@@ -485,10 +459,11 @@
     const $ = (id) => document.getElementById(id);
     const stageNames = STAGES.map((stage) => stage.name);
     const stageSet = new Set(stageNames);
-    const rankingSelects = [];
+    const rankingList = $("ranking-grid");
+    const rankingRows = new Map();
     const pairSelects = [$("stage-one"), $("stage-two")];
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let rankings = Array(STAGES.length).fill("");
+    let rankings = [...stageNames];
     let pair = ["", ""];
     let storageAvailable = true;
     let lastAnnouncement = "";
@@ -537,25 +512,30 @@
       if (!raw) return;
       try {
         const saved = JSON.parse(raw);
-        if (!saved || saved.version !== 1 || !Array.isArray(saved.rankings) || saved.rankings.length !== STAGES.length) {
-          showRankingError("保存されていた順位を読み込めませんでした。もう一度、順位を選んでください。");
+        if (!saved || saved.version !== 1 || !Array.isArray(saved.rankings)) {
+          showRankingError("保存された順位を読み込めなかったため、50音順で表示しています。");
           return;
         }
         const seen = new Set();
         let repaired = false;
-        rankings = saved.rankings.map((name) => {
-          if (name === "") return "";
+        // 旧版の24枠や未入力の枠を、まだ順位の付いていないステージで補う。
+        const slots = stageNames.map((_, index) => {
+          const name = saved.rankings[index];
+          if (name === undefined || name === "") return "";
           if (!stageSet.has(name) || seen.has(name)) { repaired = true; return ""; }
           seen.add(name);
           return name;
         });
+        const unranked = stageNames.filter((name) => !seen.has(name));
+        let next = 0;
+        rankings = slots.map((name) => name || unranked[next++]);
         if (Array.isArray(saved.pair) && saved.pair.length === 2) {
           pair = saved.pair.map((name) => stageSet.has(name) ? name : "");
           if (pair[0] && pair[0] === pair[1]) { pair[1] = ""; repaired = true; }
         }
-        if (repaired) showRankingError("保存されたデータに重複または不明なステージがあったため、該当する選択を未選択に戻しました。");
+        if (repaired) showRankingError("保存された順位や選択に重複・不明なステージがあったため、修正しました。");
       } catch (_) {
-        showRankingError("保存されていた順位を読み込めませんでした。もう一度、順位を選んでください。");
+        showRankingError("保存された順位を読み込めなかったため、50音順で表示しています。");
       }
     }
 
@@ -570,72 +550,207 @@
     }
 
     function buildRanking() {
-      const fragment = document.createDocumentFragment();
-      STAGES.forEach((_, index) => {
-        const row = document.createElement("div");
+      rankingList.style.setProperty("--rank-rows", Math.ceil(stageNames.length / 2));
+      for (const name of stageNames) {
+        const row = document.createElement("li");
         row.className = "rank-row";
-        const label = document.createElement("label");
-        label.className = "rank-index";
-        label.htmlFor = `rank-${index + 1}`;
-        label.append(String(index + 1));
+        row.dataset.stage = name;
+        row.tabIndex = 0;
+        row.setAttribute("aria-keyshortcuts", "ArrowUp ArrowDown Home End");
+        const index = document.createElement("span");
+        index.className = "rank-index";
+        index.setAttribute("aria-hidden", "true");
+        const number = document.createElement("span");
+        number.className = "rank-number";
         const unit = document.createElement("small");
         unit.textContent = "位";
-        label.append(unit);
-        const select = document.createElement("select");
-        select.className = "rank-select";
-        select.id = label.htmlFor;
-        select.setAttribute("aria-label", `${index + 1}位のステージ`);
-        select.addEventListener("change", () => {
-          const name = select.value;
-          const duplicate = name && rankings.findIndex((other, otherIndex) => otherIndex !== index && other === name);
-          if (name && duplicate !== -1) {
-            showRankingError(`${name}は${duplicate + 1}位で選択済みです。別のステージを選んでください。`);
-            select.value = rankings[index];
-            return;
-          }
-          if (name && !stageSet.has(name)) {
-            showRankingError("一覧にないステージは選べません。");
-            select.value = rankings[index];
-            return;
-          }
-          rankings[index] = name;
-          showRankingError();
-          refresh();
-          saveState();
-          const count = rankings.filter(Boolean).length;
-          announce(count === STAGES.length ? "24ステージの順位が決まりました。2つのステージを選んで判定できます。" : `${count}ステージを選択済み。あと${STAGES.length - count}ステージです。`);
-        });
-        rankingSelects.push(select);
-        row.append(label, select);
-        fragment.append(row);
-      });
-      $("ranking-grid").append(fragment);
+        index.append(number, unit);
+        const label = document.createElement("span");
+        label.className = "rank-name";
+        label.textContent = name;
+        const handle = document.createElement("span");
+        handle.className = "rank-handle";
+        handle.setAttribute("aria-hidden", "true");
+        row.append(index, label, handle);
+        rankingRows.set(name, row);
+      }
     }
 
     function refreshRankings() {
-      const selected = new Set(rankings.filter(Boolean));
-      rankingSelects.forEach((select, index) => {
-        makeOptions(select, rankings[index], selected, "ステージを選択");
-        select.parentElement.classList.toggle("is-set", Boolean(rankings[index]));
+      const orderedRows = rankings.map((name, index) => {
+        const row = rankingRows.get(name);
+        row.querySelector(".rank-number").textContent = index + 1;
+        row.setAttribute("aria-label", `${index + 1}位 ${name}`);
+        return row;
       });
-      const count = rankings.filter(Boolean).length;
-      const complete = rankingIsComplete();
-      $("progress-count").textContent = count;
-      $("progress").setAttribute("aria-valuenow", count);
-      $("progress-fill").style.width = `${count / STAGES.length * 100}%`;
-      $("progress-label").textContent = complete ? "24ステージ、準備OK！" : count ? `あと${STAGES.length - count}ステージ！` : "まずは1位から選んでみよう。";
-      $("go-judge").disabled = !complete;
-      $("cta-label").textContent = complete ? "この順位でジャッジする" : "24ステージを選ぶと判定できます";
-      $("fill-empty").disabled = complete;
-      $("reset-ranking").disabled = count === 0;
+      rankingList.replaceChildren(...orderedRows);
     }
 
+    function moveStage(name, to, scrollIntoView = false) {
+      const from = rankings.indexOf(name);
+      if (from < 0 || to < 0 || to >= rankings.length || from === to) return;
+      rankings.splice(from, 1);
+      rankings.splice(to, 0, name);
+      showRankingError();
+      refresh();
+      saveState();
+      rankingRows.get(name).focus({ preventScroll: !scrollIntoView });
+      announce(`${name}を${to + 1}位に移動しました。`);
+    }
+
+    let rankDrag = null;
+
+    function updateDropTarget() {
+      const drag = rankDrag;
+      if (!drag?.preview) return;
+      const { x, y, from } = drag;
+      const previewX = Math.max(8, Math.min(x - drag.previewWidth / 2, window.innerWidth - drag.previewWidth - 8));
+      const previewY = Math.max(8, Math.min(y + 14, window.innerHeight - drag.previewHeight - 8));
+      drag.preview.style.transform = `translate3d(${previewX}px, ${previewY}px, 0)`;
+
+      drag.marker?.removeAttribute("data-drop-edge");
+      drag.marker = null;
+      drag.to = null;
+      const bounds = rankingList.getBoundingClientRect();
+      if (x < bounds.left || x > bounds.right || y < bounds.top - 7 || y > bounds.bottom + 7) return;
+
+      // まず横に近い列を選び、その列で一番近い行を探す。
+      let closestX = Infinity;
+      let closestY = Infinity;
+      let slot = 0;
+      let edge = "";
+      const rows = rankingList.children;
+      for (let index = 0; index < rows.length; index++) {
+        const row = rows[index];
+        const rect = row.getBoundingClientRect();
+        const distanceX = Math.max(rect.left - x, 0, x - rect.right);
+        const distanceY = Math.max(rect.top - y, 0, y - rect.bottom);
+        if (distanceX > closestX || (distanceX === closestX && distanceY >= closestY)) continue;
+        closestX = distanceX;
+        closestY = distanceY;
+        const after = y >= rect.top + rect.height / 2;
+        slot = index + (after ? 1 : 0);
+        edge = after ? "after" : "before";
+        drag.marker = row;
+      }
+      const to = slot > from ? slot - 1 : slot;
+      if (to !== from && drag.marker) {
+        drag.to = to;
+        drag.marker.dataset.dropEdge = edge;
+      }
+    }
+
+    function scrollRankDrag(time) {
+      const drag = rankDrag;
+      if (!drag?.preview) return;
+      const elapsed = Math.min((time - (drag.scrollTime ?? time)) / 1000, .05);
+      drag.scrollTime = time;
+      const edge = Math.min(72, window.innerHeight / 5);
+      const up = Math.max(0, 1 - drag.y / edge);
+      const down = Math.max(0, 1 - (window.innerHeight - drag.y) / edge);
+      const bounds = rankingList.getBoundingClientRect();
+      if (drag.x >= bounds.left && drag.x <= bounds.right && up !== down) {
+        const delta = (down - up) * 900 * elapsed;
+        const first = Math.min(0, bounds.top - drag.y);
+        const last = Math.max(0, bounds.bottom - drag.y);
+        window.scrollBy(0, Math.max(first, Math.min(delta, last)));
+      }
+      drag.scrollFrame = requestAnimationFrame(scrollRankDrag);
+    }
+
+    function finishRankDrag(commit) {
+      const drag = rankDrag;
+      if (!drag) return;
+      rankDrag = null;
+      cancelAnimationFrame(drag.scrollFrame);
+      drag.preview?.remove();
+      drag.marker?.removeAttribute("data-drop-edge");
+      drag.row.classList.remove("is-dragged");
+      rankingList.classList.remove("is-dragging");
+      if (rankingList.hasPointerCapture(drag.pointerId)) rankingList.releasePointerCapture(drag.pointerId);
+      if (commit && drag.to !== null) moveStage(drag.row.dataset.stage, drag.to);
+    }
+
+    rankingList.addEventListener("pointerdown", (event) => {
+      const row = event.target.closest(".rank-row");
+      if (!row || rankDrag || !event.isPrimary || event.button !== 0) return;
+      if (event.pointerType === "touch" && !event.target.closest(".rank-handle")) return;
+      event.preventDefault();
+      row.focus({ preventScroll: true });
+      rankingList.setPointerCapture(event.pointerId);
+      rankDrag = {
+        row, from: rankings.indexOf(row.dataset.stage), pointerId: event.pointerId,
+        x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY,
+        preview: null, marker: null, to: null, scrollFrame: 0, scrollTime: null
+      };
+    });
+
+    rankingList.addEventListener("pointermove", (event) => {
+      const drag = rankDrag;
+      if (!drag || event.pointerId !== drag.pointerId) return;
+      drag.x = event.clientX;
+      drag.y = event.clientY;
+      if (!drag.preview) {
+        if (Math.hypot(drag.x - drag.startX, drag.y - drag.startY) < 6) return;
+        const preview = document.createElement("div");
+        preview.className = "rank-drag-preview";
+        preview.textContent = drag.row.dataset.stage;
+        preview.setAttribute("aria-hidden", "true");
+        drag.previewWidth = Math.min(drag.row.offsetWidth, window.innerWidth - 16);
+        preview.style.width = `${drag.previewWidth}px`;
+        document.body.append(preview);
+        drag.preview = preview;
+        drag.previewHeight = preview.offsetHeight;
+        rankingList.classList.add("is-dragging");
+        drag.row.classList.add("is-dragged");
+        drag.scrollFrame = requestAnimationFrame(scrollRankDrag);
+      }
+      updateDropTarget();
+    });
+
+    rankingList.addEventListener("pointerup", (event) => {
+      if (event.pointerId !== rankDrag?.pointerId) return;
+      rankDrag.x = event.clientX;
+      rankDrag.y = event.clientY;
+      updateDropTarget();
+      finishRankDrag(true);
+    });
+
+    for (const eventName of ["pointercancel", "lostpointercapture"]) {
+      rankingList.addEventListener(eventName, (event) => {
+        if (event.pointerId === rankDrag?.pointerId) finishRankDrag(false);
+      });
+    }
+    window.addEventListener("blur", () => finishRankDrag(false));
+    window.addEventListener("scroll", updateDropTarget, { passive: true });
+
+    rankingList.addEventListener("keydown", (event) => {
+      if (rankDrag) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          finishRankDrag(false);
+        }
+        return;
+      }
+      const row = event.target.closest(".rank-row");
+      if (!row || event.altKey || event.ctrlKey || event.metaKey) return;
+      const from = rankings.indexOf(row.dataset.stage);
+      let to;
+      switch (event.key) {
+        case "ArrowUp": to = Math.max(0, from - 1); break;
+        case "ArrowDown": to = Math.min(rankings.length - 1, from + 1); break;
+        case "Home": to = 0; break;
+        case "End": to = rankings.length - 1; break;
+        default: return;
+      }
+      event.preventDefault();
+      moveStage(row.dataset.stage, to, true);
+    });
+
     function refreshPair() {
-      const complete = rankingIsComplete();
       pairSelects.forEach((select, index) => {
         makeOptions(select, pair[index], new Set([pair[1 - index]].filter(Boolean)), "ステージを選択");
-        select.disabled = !complete;
-        const rank = complete && pair[index] ? rankings.indexOf(pair[index]) + 1 : 0;
+        const rank = rankings.indexOf(pair[index]) + 1;
         $(index ? "rank-two" : "rank-one").textContent = rank ? `${rank}位` : "— 位";
       });
     }
@@ -662,9 +777,7 @@
         delete document.documentElement.dataset.rating;
         setCharacterMotion("A");
         $("rating-letter").textContent = "?";
-        const complete = rankingIsComplete();
-        $("waiting-heading").textContent = complete ? "どの2ステで潜る？" : "まずは順位付け！";
-        setSpeech(complete ? ["今日の2ステージを", "選んでみるわかば！"] : ["まずは、好きな順に", "ステージを並べるわかば！"]);
+        setSpeech(["今日の2ステージを", "選んでみるわかば！"]);
         setEffects("");
         return;
       }
@@ -699,33 +812,26 @@
       });
     });
 
-    $("fill-empty").addEventListener("click", () => {
-      const used = new Set(rankings.filter(Boolean));
-      const remaining = stageNames.filter((name) => !used.has(name));
-      let next = 0;
-      rankings = rankings.map((name) => name || remaining[next++]);
-      showRankingError();
-      refresh();
-      saveState();
-      announce(`空いていた${next}枠を50音順で埋めました。順位は各プルダウンで変更できます。`);
-    });
-
     $("go-judge").addEventListener("click", () => {
       $("judgement").scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "start" });
       pairSelects[0].focus({ preventScroll: true });
     });
 
-    $("reset-ranking").addEventListener("click", () => $("reset-dialog").showModal());
+    $("reset-ranking").addEventListener("click", () => {
+      const dialog = $("reset-dialog");
+      dialog.returnValue = "";
+      dialog.showModal();
+    });
     $("reset-dialog").addEventListener("close", () => {
       if ($("reset-dialog").returnValue !== "reset") return;
-      rankings = Array(STAGES.length).fill("");
+      rankings = [...stageNames];
       pair = ["", ""];
       $("pair-error").hidden = true;
       showRankingError();
       refresh();
       saveState();
-      rankingSelects[0].focus();
-      announce("順位をリセットしました。");
+      rankingRows.get(rankings[0]).focus({ preventScroll: true });
+      announce("25ステージの順位を50音順に戻しました。");
     });
 
     // 本体と尖りを1本の輪郭で描き、継ぎ目の線や塗りの食い込みをなくす。
